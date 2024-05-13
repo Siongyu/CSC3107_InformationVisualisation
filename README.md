@@ -1,0 +1,2 @@
+# CSC3107_InformationVisualisation
+All the labs on module CSC3107_InformationVisualisation
