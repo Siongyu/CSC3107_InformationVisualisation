@@ -1,0 +1,465 @@
+---
+title: "CSC3107 P2 Lab 1"
+author: "Loo Siong Yu"
+format: html
+theme: lux
+---
+
+# Loading library
+```{r}
+#| warning: false
+library(tidyverse)
+```
+
+# Task 2: Aggregating Information about Flights
+## Unzip the folder
+```{r}
+#| warning: false
+#| code-fold: true
+unzip("nycflights13_data.zip")
+```
+
+## Import data
+```{r}
+#| warning: false
+#| code-fold: true
+airlines <- read_csv("airlines.csv")
+airports <- read_csv("airports.csv")
+flights <- read_csv("flights.csv")
+planes <- read_csv("planes.csv")
+weather <- read_csv("weather.csv")
+```
+
+## 2.2 Rankings of New York City's Main Airports by Number of Destinations Served
+What are the rankings of New York City’s main airports in terms of the number of destinations served? Include columns for the following attributes in exactly this order:
+
+- Three-letter airport code
+- Airport name
+- Number of destinations
+- Rank. The busiest airport is ranked first.
+
+Sort the results first by rank and, then, alphabetically by the three-letter airport code.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  distinct(origin, dest) |>
+  count(origin, name = "n_dest") |>
+  left_join(airports, join_by("origin" == "faa")) |>
+  mutate(rank = min_rank(desc(`n_dest`))) |>
+  select(origin, name, n_dest, rank) |>
+  arrange(rank, origin)
+```
+
+## 2.3 Top Ten Destination Airports by Seats
+Which ten destination airports are served by the greatest number of seats from New York City? If airports are tied for the tenth place, ensure that all tied airports are included in the output. Include columns for the following attributes in exactly this order:
+
+- Three-letter airport code
+- Airport name
+- Number of seats
+- Rank. The destination with most seats is ranked first.
+
+Sort the results first by rank and, then, alphabetically by the three-letter airport code.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  left_join(planes, join_by("tailnum" == "tailnum")) |>
+  # summarize the data by calculating the total no. of seats and grouping the summarized data by dest with the .by, resulting in the total no. of seats assigning to each unique destination
+  summarize(n_seats = sum(seats), .by = dest) |>
+  left_join(airports, join_by("dest" == "faa")) |>
+  mutate(rank = min_rank(desc(n_seats))) |>
+  select(dest, name, n_seats, rank) |>
+  arrange(rank, dest) |>
+  filter(rank <= 10)
+```
+Note that all tail numbers and numbers of seats contain no NA:
+```{r}
+anyNA(flights$tailnum) | anyNA(planes$tailnum) | anyNA(planes$seats)
+```
+
+## 2.4 Top Ten Destination Airports Served by Flights from Each New York City Airport
+For each of New York City’s main airports, which ten destination airports are most frequently served by flights? If airports are tied for the tenth place, ensure that all tied airports are included in the output. Include columns for the following attributes in exactly this order:
+
+- Three-letter code of the origin airport
+- Name of the origin airport
+- Three-letter code of the destination airport
+- Name of the destination airport
+- Number of flights
+- Rank. The destination with most flights is ranked first.
+
+First, sort the results alphabetically by the three-letter code of the origin airport, then by rank, and, lastly, alphabetically by the three-letter destination code.
+
+Display all rows in the output using ```print(n = Inf)```.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  count(origin, dest, name = "n_flights") |>
+  mutate(rank = min_rank(desc(n_flights)), .by = origin) |>
+  filter(rank <= 10) |>
+  left_join(airports, join_by(origin == faa)) |>
+  rename(origin_name = name) |>
+  left_join(airports, join_by(dest == faa)) |>
+  rename(dest_name = name) |>
+  select(origin, origin_name, dest, dest_name, n_flights, rank) |>
+  arrange(origin, rank, dest) |>
+  print(n = Inf)
+```
+
+## 2.5 Rankings of New York City's Main Airports by Mean Departure Delay
+What are the rankings of New York City’s main airports in terms of mean departure delay, weighting each flight equally when taking the average? Remove flights with unknown departure delays from the analysis. Include columns for the following attributes in exactly this order:
+
+- Three-letter airport code
+- Airport name
+- Mean departure delay in minutes
+- Rank. The airport with the shortest mean departure delay is ranked first.
+
+Sort the results first by rank and, then, alphabetically by the three-letter airport code.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  group_by(origin) |>
+  summarize(mean_dep_delay = mean(dep_delay, na.rm = TRUE)) |>
+  mutate(rank = min_rank(mean_dep_delay)) |>
+  left_join(airports, join_by(origin == faa)) |>
+  select(origin, name, mean_dep_delay, rank) |>
+  arrange(rank, origin)
+```
+
+## 2.6 Percentage of On-Time Flights despite Departure Delay
+What percentage of flights that experienced a departure delay of at least 30 minutes still managed to arrive on time? Remove flights with unknown departure or arrival delays from the analysis. Provide the answer as a single-element numeric vector. Confirm that the answer has the correct length and class.
+```{r}
+#| warning: false
+#| code-fold: true
+
+on_time_pct <-
+  flights |>
+    drop_na(ends_with("delay")) |>
+    filter(dep_delay >= 30) |>
+    mutate(on_time_arr = arr_delay <= 0) |>
+    count(on_time_arr, name="n_flights") |>
+    mutate(pct = n_flights / sum(n_flights) * 100) |>
+    filter(on_time_arr == TRUE) |>
+    pull(var = pct)
+on_time_pct
+```
+Here is a confirmation that the result is a single-element numeric vector:
+```{r}
+#| code-fold: true
+is.numeric(on_time_pct) && length(on_time_pct) == 1
+```
+
+## 2.7 On-Time Departure Percentage by Hour of the Day
+Tabulate the percentage of on-time departures for each hour of the day when the plane is scheduled to leave. Remove flights with unknown departure delays from the analysis. Include columns for the following attributes in exactly this order:
+
+- Hour of the day
+- Percentage of on-time departures
+
+Sort the results by the hour of the day. Display all hours in the output.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  drop_na(dep_delay) |>
+  mutate(on_time_dep = dep_delay <= 0) |>
+  count(hour, on_time_dep, name = "n_flights") |>
+  group_by(hour) |>
+  mutate(pct_flights = n_flights / sum(n_flights) * 100) |>
+  filter(on_time_dep == TRUE) |>
+  select(hour, pct_flights) |>
+  arrange(hour) |>
+  print(n = Inf)
+```
+
+## 2.8 Planes Operated by Multiple Airlines
+Which planes, identified by their tail number, were operated by more than one airline? Include columns for the following attributes in exactly this order:
+
+- Tail number
+- Manufacturer
+- Model
+- Number of airlines (must be greater than 1)
+
+Sort the results alphabetically by tail number. Display all planes in the output.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  distinct(tailnum, carrier) |>
+  summarize(n_carriers = n(), .by = tailnum) |>
+  filter(n_carriers > 1) |>
+  left_join(planes, join_by(tailnum)) |>
+  select(tailnum, manufacturer, model, n_carriers) |>
+  arrange(tailnum) |>
+  print(n = Inf)
+```
+
+---
+
+# Task 3: Exploring Flights from New York City to Chicago
+## 3.1 Identify Chicago Airports
+Which airport names in ```airports.csv``` contain the string ```"Chicago"```? You may find the tidyverse’s ```str_detect()``` function useful for this task. Create a data frame named ```chicago_airports``` to save the result, including only the ```faa``` and ```name``` columns. Display the content of ```chicago_airports```.
+```{r}
+#| warning: false
+#| code-fold: true
+
+chicago_aiports <-
+  airports |>
+    filter(str_detect(name, "Chicago")) |>
+    select(faa, name)
+
+chicago_aiports
+```
+
+## 3.2 Airlines Serving Chicago from New York City
+Which airlines operated flights from New York City to Chicago? Include columns for the following attributes in exactly this order:
+
+- Two-letter airline code
+- Airline name
+- Number of flights
+- Rank. The airline operating most flights is ranked first.
+
+Sort the results first by rank and, then, alphabetically by the two-letter airline code.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  left_join(airports, join_by(dest == faa)) |>
+  filter(str_detect(name, "Chicago")) |>
+  summarize(n_flights = n(), .by = carrier) |>
+  left_join(airlines, join_by(carrier)) |>
+  mutate(rank = min_rank(desc(n_flights))) |>
+  select(carrier, name, n_flights, rank) |>
+  arrange(rank, carrier)
+```
+**Prof answer** -
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  semi_join(chicago_aiports, join_by(dest == faa)) |>
+  count(carrier, name = "n_flights") |>
+  left_join(airlines, join_by(carrier)) |>
+  mutate(rank = min_rank(desc(n_flights))) |>
+  select(carrier, name, n_flights, rank) |>
+  arrange(rank, carrier)
+```
+
+## 3.3 On-Time Arrival Percentages by Airline
+Of all airlines that operated at least 100 flights from New York City to Chicago, which ones had the ten highest percentages of known on-time arrivals in Chicago? Include columns for the following attributes in exactly this order:
+
+- Two-letter airline code
+- Airline name
+- Percentage of on-time arrivals
+- Rank
+
+Sort the results first by rank and, then, alphabetically by two-letter airline code.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  semi_join(chicago_aiports, join_by(dest == faa)) |>
+  filter(n() >= 100, .by = carrier) |>
+  mutate(on_time_arr = arr_delay <= 0) |>
+  count(carrier, on_time_arr, name = "n_flights") |>
+  mutate(pct = n_flights / sum(n_flights) * 100, .by = carrier) |>
+  filter(on_time_arr == TRUE) |>
+  left_join(airlines, join_by(carrier)) |>
+  mutate(rank = min_rank(desc(pct))) |>
+  select(carrier, name, pct, rank) |>
+  arrange(rank, carrier)
+```
+
+## 3.4 Top Ten Models by Frequency
+What were the ten most frequent combinations of manufacturer and model used for flights from New York City to Chicago? If manufacturer-model combinations are tied for the tenth place, incorporate all of them in the output. Include columns for the following attributes in exactly this order:
+
+- Manufacturer
+- Model
+- Number of flights
+- Rank
+
+Sort the results first by rank, then alphabetically by manufacturer, and, lastly, by model.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  semi_join(chicago_aiports, join_by(dest == faa)) |>
+  left_join(planes, join_by(tailnum)) |>
+  count(manufacturer, model, name = "n_flights") |>
+  mutate(rank = min_rank(desc(n_flights))) |>
+  slice_min(rank, n = 10) |> # or use filter(rank <= 10)
+  arrange(rank, manufacturer, model)
+```
+
+## 3.5 Top Ten Planes by Mean Speed
+Which ten planes, among those with at least ten flights departing from New York City, exhibited the highest observed mean speed on flights to Chicago? The speed calculation considers the distance between airports and the time spent in the air, with each flight equally weighted in the average. Remove flights with unknown time spent in the air from the analysis. In the case of ties for the tenth place, ensure that all tied planes are included in the output. Include columns for the following attributes in exactly this order:
+
+- Tail number
+- Manufacturer
+- Model
+- Mean speed in miles per hour
+- Rank
+
+Sort the results first by rank and, then, alphabetically by tail number.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  semi_join(chicago_aiports, join_by(dest == faa)) |>
+  mutate(speed_2 = distance / air_time * 60) |>
+  # with at least 10 flights done by the plane
+  filter(n() >= 10, .by = tailnum) |>
+  summarize(mean_speed = mean(speed_2, na.rm = TRUE), .by = tailnum) |>
+  left_join(planes, join_by(tailnum)) |>
+  mutate(rank = min_rank(desc(mean_speed))) |>
+  filter(rank <= 10) |>
+  select(tailnum, manufacturer, model, mean_speed, rank) |>
+  arrange(rank, tailnum)
+```
+
+## 3.6 Were there daily departures in October?
+Was at least one departure from New York City to Chicago scheduled every day in October 2013? Provide your answer in the form of a single-element logical vector. Confirm that the answer has the correct length and class.
+```{r}
+#| warning: false
+#| code-fold: true
+
+departed_daily <-
+  flights |>
+    semi_join(chicago_aiports, join_by(dest == faa)) |>
+    filter(month == 10) |>
+    distinct(day) |>
+    pull() |># this converts the resulting data into a vector
+    as.integer() |> # this converts the original double vector into an integer vector
+    identical(1:31) # this checks if the resulting vector is identical to the integer vector from 1 to 31
+  
+departed_daily
+```
+**Note**: Here is confirmation that the result is a single-element logical vector -
+```{r}
+#| code-fold: true
+
+length(departed_daily) == 1 & is.logical(departed_daily)
+```
+
+---
+
+# Task 4: Uncovering associations between weather and flight operations
+## 4.1 Airport-Hour Combinations Absent from the Weather Table
+How many unique combinations of origin airport and ```time_hour``` are present in ```flights.csv``` but absent from ```weather.csv```? Provide your answer in the form of a single-element numeric vector. Confirm that the answer has the correct length and class.
+```{r}
+#| warning: false
+#| code-fold: true
+
+uniqueComb <-
+  flights |>
+    distinct(origin, time_hour) |>
+    anti_join(weather, join_by(origin, time_hour)) |>
+    count(origin, name = "n_combination") |>
+    summarize(sum(n_combination)) |>
+    pull()
+
+uniqueComb
+```
+**Prof ans ** -
+```{r}
+#| code-fold: true
+
+n_absent <-
+  flights |>
+    distinct(origin, time_hour) |>
+    anti_join(weather, join_by(origin, time_hour)) |>
+    nrow()
+n_absent
+```
+**Note**: Here is confirmation that the result is correct length and class
+```{r}
+#| code-fold: true
+
+length(uniqueComb) == 1 & is.numeric(uniqueComb)
+length(n_absent) == 1 & is.numeric(n_absent)
+```
+
+## 4.2 On-time Departures by Airport and Precipitation
+What is the percentage of on-time departures from each of New York City’s main airports under dry conditions (i.e., precip = 0) and under wet conditions? Remove flights from the analysis if the delay or precipitation at departure is unknown. Include columns for the following attributes in exactly this order:
+
+- Three-letter airport code
+- Airport name
+- ```is_dry```: Logical values indicating zero precipitation.
+- Percentage of on-time departures
+
+First, sort the results alphabetically by the three-letter airport code and, then, by the presence of precipitation (with dry conditions appearing before wet ones).
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  left_join(weather, join_by(origin, time_hour)) |>
+  drop_na(precip, dep_delay) |>
+  mutate(is_dry = precip == 0, on_time_dep = dep_delay <= 0) |>
+  count(origin, is_dry, on_time_dep, name = "n_flights") |> # count the number of flights by origin, is_dry, and on_time_dep
+  mutate(pct_flights = n_flights / sum(n_flights) * 100, .by = c(origin, is_dry)) |>
+  filter(on_time_dep == TRUE) |>
+  left_join(airports, join_by(origin == faa)) |>
+  select(origin, name, is_dry, pct_flights) |>
+  arrange(origin, desc(is_dry))
+```
+
+## 4.3 Rank Airports by Low-Visibility Departure Delays
+How do New York City’s main airports rank in terms of mean departure delay when the visibility was less than one mile? Remove flights with unknown departure delays from the analysis. Include columns for the following attributes in exactly this order:
+
+- Three-letter airport code
+- Airport name
+- Mean departure delay in minutes
+- Rank. The airport with the shortest mean departure delay is ranked first.
+
+Sort the results first by rank and, then, alphabetically by the three-letter airport code.
+```{r}
+#| warning: false
+#| code-fold: true
+
+flights |>
+  left_join(weather, join_by(origin, time_hour)) |>
+  drop_na(dep_delay) |>
+  filter(visib < 1) |>
+  summarize(mean_dep_delay = mean(dep_delay), .by = origin) |>
+  left_join(airports, join_by(origin == faa)) |>
+  mutate(rank = min_rank(mean_dep_delay)) |>
+  select(origin, name, mean_dep_delay, rank) |>
+  arrange(rank, origin)
+```
+
+## 4.4 Correlation between Temperature and Departure Delay
+What is the correlation coefficient between the mean temperature of the day and the mean departure delay on that day? Remove flights from the analysis if the temperature or departure delay is unknown. Provide the answer in the form of a single-element numeric vector. Confirm that the answer has the correct length and class.
+```{r}
+#| warning: false
+#| code-fold: true
+
+corr <-
+  flights |>
+    left_join(weather, join_by(origin, year, month, day, time_hour)) |>
+    drop_na(temp, dep_delay) |>
+    summarize(mean_temp = mean(temp), mean_dep_delay = mean(dep_delay), .by = c(year, month, day)) |>
+    summarize(cor = cor(mean_temp, mean_dep_delay)) |>
+    pull()
+
+corr
+```
+**Note**: Here is confirmation that corr is a single-element numeric vector - 
+```{r}
+#| code-fold: true
+
+length(corr) == 1 & is.numeric(corr)
+```
+

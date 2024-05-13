@@ -1,0 +1,123 @@
+---
+title: "CSC3107 P2 Lab 1"
+author: "xxx, yyy, zzz"
+format: html
+---
+
+# Library
+
+```{r}
+#| warning: false
+library(tidyverse)
+```
+
+# Unzip the folder
+
+```{r}
+#| warning: false
+unzip("nycflights13_data.zip")
+```
+
+# Import data
+
+```{r}
+#| warning: false
+airlines <- read_csv("airlines.csv")
+airports <- read_csv("airports.csv")
+flights <- read_csv("flights.csv")
+planes <- read_csv("planes.csv")
+weather <- read_csv("weather.csv")
+```
+
+```{r}
+flights |>
+  distinct(origin, dest)|> # keep only unique rows
+  count(origin, name = "n_dest")|> # count the number of unique destinations
+  left_join(airports, join_by(origin == faa))|> # join dataframes
+  mutate(rank = min_rank(desc(n_dest)))|> # create ranking
+  select(origin, name, n_dest, rank)|> # only select certain columns
+  arrange(rank) # sort by rank
+```
+
+### 2.3 Top 10 desination airports by seats
+
+```{r}
+flights |>
+  left_join(planes, join_by(tailnum == tailnum)) |>
+  distinct(origin, dest, seats) |>
+  left_join(airports, join_by(origin == faa)) |>
+  mutate(rank = min_rank(desc(seats))) |>
+  select(origin, dest, name, seats, rank) |>
+  filter(rank <= 10) |>
+  arrange(rank)
+```
+
+### 2.4 Top 10 destination airports served by flights from each New York City Airport
+```{r}
+
+# Grouping by origin and destination, counting flights to each destination
+destination_counts <- flights |>
+  group_by(origin, dest) |>
+  summarise(num_flights = n(), .groups = "drop") |>
+
+# Ranking destinations within each origin airport
+ranked_destinations <- destination_counts |>
+  arrange(origin, desc(num_flights), dest) |>
+  mutate(rank = row_number()) |>
+  group_by(origin) |>
+  filter(rank <= 10) |>
+  arrange(origin, rank, dest)
+
+# Joining with airport names
+result <- ranked_destinations |>
+  left_join(airports, by = c("origin" = "faa")) |>
+  rename(origin_name = name) |>
+  left_join(airports, by = c("dest" = "faa")) |>
+  rename(dest_name = name) |>
+  select(origin, origin_name, dest, dest_name, num_flights, rank)
+
+# Displaying all rows
+print(result, n = Inf)
+```
+
+### 2.5 Rankings of New York City’s Main Airports by Mean Departure Delay
+```{r}
+flights |>
+  group_by(origin) |>
+  summarise(mean_dep_delay = mean(dep_delay, na.rm = TRUE), .groups = "drop") |>
+  mutate(rank = min_rank(mean_dep_delay)) |>
+  left_join(airports, by = c("origin" = "faa")) |>
+  select(origin, name, mean_dep_delay, rank) |>
+  arrange(rank)
+```
+
+### 2.6 Percentage of On-Time Flights Despite Departure Delay
+```{r}
+flights |>
+  filter(!is.na(dep_delay), !is.na(arr_delay)) |>
+  mutate(on_time = arr_delay <= 0, dep_delayed = dep_delay >= 30) |>
+  filter(dep_delayed) |>
+  summarise(percentage = mean(on_time) * 100)
+```
+
+### 2.7 On-Time Departure Percentage by Hour of the Day
+```{r}
+flights |>
+  filter(!is.na(dep_time), !is.na(dep_delay)) |>
+  mutate(dep_hour = dep_time %/% 100) |>
+  group_by(dep_hour) |>
+  summarise(on_time = mean(dep_delay <= 0) * 100, .groups = "drop") |>
+  arrange(dep_hour)
+```
+
+### 2.8 Planes Operated by Multiple Airlines
+```{r}
+planes |>
+  group_by(tailnum) |>
+  summarise(n_airlines = n_distinct(airline), .groups = "drop") |>
+  filter(n_airlines > 1) |>
+  left_join(planes, by = "tailnum") |>
+  select(tailnum, manufacturer, model, n_airlines) |>
+  arrange(tailnum)
+```
+

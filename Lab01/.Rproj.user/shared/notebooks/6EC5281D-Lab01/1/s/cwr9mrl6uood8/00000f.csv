@@ -1,0 +1,18 @@
+"0","planes |>"
+"0","  group_by(tailnum) |>"
+"0","  summarise(n_airlines = n_distinct(airline), .groups = ""drop"") |>"
+"0","  filter(n_airlines > 1) |>"
+"0","  left_join(planes, by = ""tailnum"") |>"
+"0","  select(tailnum, manufacturer, model, n_airlines) |>"
+"0","  arrange(tailnum)"
+"1","[1m[33mError[39m in `summarise()`:[22m
+[38;5;252m[36mℹ[38;5;252m In argument: `n_airlines = n_distinct(airline)`.
+[36mℹ[38;5;252m In group 1: `tailnum = ""N10156""`.[39m
+[1mCaused by error:[22m
+[33m![39m object 'airline' not found
+Backtrace:
+[90m  1. [39m[1mdplyr[22m::arrange(...)
+[90m 14. [39mdplyr::n_distinct(airline)
+[90m 15. [39m[1mvctrs[22m::df_list(...)
+[90m 16. [39m[1mrlang[22m::list2(...)
+"

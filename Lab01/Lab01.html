@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Loo Siong Yu">
+
+<title>CSC3107 P2 Lab 1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Lab01_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Lab01_files/libs/quarto-html/quarto.js"></script>
+<script src="Lab01_files/libs/quarto-html/popper.min.js"></script>
+<script src="Lab01_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Lab01_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Lab01_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Lab01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Lab01_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Lab01_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Lab01_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">CSC3107 P2 Lab 1</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Loo Siong Yu </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="loading-library" class="level1">
+<h1>Loading library</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="task-2-aggregating-information-about-flights" class="level1">
+<h1>Task 2: Aggregating Information about Flights</h1>
+<section id="unzip-the-folder" class="level2">
+<h2 class="anchored" data-anchor-id="unzip-the-folder">Unzip the folder</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span>(<span class="st">"nycflights13_data.zip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="import-data" class="level2">
+<h2 class="anchored" data-anchor-id="import-data">Import data</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>airlines <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"airlines.csv"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>airports <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"airports.csv"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>flights <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"flights.csv"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>planes <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"planes.csv"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>weather <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"weather.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="rankings-of-new-york-citys-main-airports-by-number-of-destinations-served" class="level2">
+<h2 class="anchored" data-anchor-id="rankings-of-new-york-citys-main-airports-by-number-of-destinations-served">2.2 Rankings of New York City’s Main Airports by Number of Destinations Served</h2>
+<p>What are the rankings of New York City’s main airports in terms of the number of destinations served? Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Three-letter airport code</li>
+<li>Airport name</li>
+<li>Number of destinations</li>
+<li>Rank. The busiest airport is ranked first.</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by the three-letter airport code.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(origin, dest) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(origin, <span class="at">name =</span> <span class="st">"n_dest"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(<span class="st">"origin"</span> <span class="sc">==</span> <span class="st">"faa"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">n_dest</span><span class="st">`</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(origin, name, n_dest, rank) <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, origin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  origin name                n_dest  rank
+  &lt;chr&gt;  &lt;chr&gt;                &lt;int&gt; &lt;int&gt;
+1 EWR    Newark Liberty Intl     82     1
+2 LGA    La Guardia              68     2
+3 JFK    John F Kennedy Intl     65     3</code></pre>
+</div>
+</div>
+</section>
+<section id="top-ten-destination-airports-by-seats" class="level2">
+<h2 class="anchored" data-anchor-id="top-ten-destination-airports-by-seats">2.3 Top Ten Destination Airports by Seats</h2>
+<p>Which ten destination airports are served by the greatest number of seats from New York City? If airports are tied for the tenth place, ensure that all tied airports are included in the output. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Three-letter airport code</li>
+<li>Airport name</li>
+<li>Number of seats</li>
+<li>Rank. The destination with most seats is ranked first.</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by the three-letter airport code.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(planes, <span class="fu">join_by</span>(<span class="st">"tailnum"</span> <span class="sc">==</span> <span class="st">"tailnum"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># summarize the data by calculating the total no. of seats and grouping the summarized data by dest with the .by, resulting in the total no. of seats assigning to each unique destination</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_seats =</span> <span class="fu">sum</span>(seats), <span class="at">.by =</span> dest) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(<span class="st">"dest"</span> <span class="sc">==</span> <span class="st">"faa"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(n_seats))) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(dest, name, n_seats, rank) <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, dest) <span class="sc">|&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rank <span class="sc">&lt;=</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 4
+   dest  name                            n_seats  rank
+   &lt;chr&gt; &lt;chr&gt;                             &lt;dbl&gt; &lt;int&gt;
+ 1 LAX   Los Angeles Intl                3177738     1
+ 2 MCO   Orlando Intl                    2362894     2
+ 3 SFO   San Francisco Intl              2342074     3
+ 4 CLT   Charlotte Douglas Intl          2201151     4
+ 5 ATL   Hartsfield Jackson Atlanta Intl 2103603     5
+ 6 FLL   Fort Lauderdale Hollywood Intl  2081712     6
+ 7 ORD   Chicago Ohare Intl              1732559     7
+ 8 IAH   George Bush Intercontinental    1216724     8
+ 9 DEN   Denver Intl                     1206507     9
+10 TPA   Tampa Intl                      1153529    10</code></pre>
+</div>
+</div>
+<p>Note that all tail numbers and numbers of seats contain no NA:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anyNA</span>(flights<span class="sc">$</span>tailnum) <span class="sc">|</span> <span class="fu">anyNA</span>(planes<span class="sc">$</span>tailnum) <span class="sc">|</span> <span class="fu">anyNA</span>(planes<span class="sc">$</span>seats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+</section>
+<section id="top-ten-destination-airports-served-by-flights-from-each-new-york-city-airport" class="level2">
+<h2 class="anchored" data-anchor-id="top-ten-destination-airports-served-by-flights-from-each-new-york-city-airport">2.4 Top Ten Destination Airports Served by Flights from Each New York City Airport</h2>
+<p>For each of New York City’s main airports, which ten destination airports are most frequently served by flights? If airports are tied for the tenth place, ensure that all tied airports are included in the output. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Three-letter code of the origin airport</li>
+<li>Name of the origin airport</li>
+<li>Three-letter code of the destination airport</li>
+<li>Name of the destination airport</li>
+<li>Number of flights</li>
+<li>Rank. The destination with most flights is ranked first.</li>
+</ul>
+<p>First, sort the results alphabetically by the three-letter code of the origin airport, then by rank, and, lastly, alphabetically by the three-letter destination code.</p>
+<p>Display all rows in the output using <code>print(n = Inf)</code>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(origin, dest, <span class="at">name =</span> <span class="st">"n_flights"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(n_flights)), <span class="at">.by =</span> origin) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rank <span class="sc">&lt;=</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(origin <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">origin_name =</span> name) <span class="sc">|&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">dest_name =</span> name) <span class="sc">|&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(origin, origin_name, dest, dest_name, n_flights, rank) <span class="sc">|&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(origin, rank, dest) <span class="sc">|&gt;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 30 × 6
+   origin origin_name         dest  dest_name                    n_flights  rank
+   &lt;chr&gt;  &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt;                            &lt;int&gt; &lt;int&gt;
+ 1 EWR    Newark Liberty Intl BOS   General Edward Lawrence Log…      5278     1
+ 2 EWR    Newark Liberty Intl SFO   San Francisco Intl                5016     2
+ 3 EWR    Newark Liberty Intl ATL   Hartsfield Jackson Atlanta …      4950     3
+ 4 EWR    Newark Liberty Intl CLT   Charlotte Douglas Intl            4943     4
+ 5 EWR    Newark Liberty Intl MCO   Orlando Intl                      4858     5
+ 6 EWR    Newark Liberty Intl LAX   Los Angeles Intl                  4434     6
+ 7 EWR    Newark Liberty Intl IAH   George Bush Intercontinental      3844     7
+ 8 EWR    Newark Liberty Intl ORD   Chicago Ohare Intl                3780     8
+ 9 EWR    Newark Liberty Intl FLL   Fort Lauderdale Hollywood I…      3727     9
+10 EWR    Newark Liberty Intl DTW   Detroit Metro Wayne Co            3134    10
+11 JFK    John F Kennedy Intl LAX   Los Angeles Intl                 11082     1
+12 JFK    John F Kennedy Intl SFO   San Francisco Intl                7751     2
+13 JFK    John F Kennedy Intl MCO   Orlando Intl                      4735     3
+14 JFK    John F Kennedy Intl BOS   General Edward Lawrence Log…      4393     4
+15 JFK    John F Kennedy Intl FLL   Fort Lauderdale Hollywood I…      4003     5
+16 JFK    John F Kennedy Intl BUF   Buffalo Niagara Intl              3530     6
+17 JFK    John F Kennedy Intl LAS   Mc Carran Intl                    3402     7
+18 JFK    John F Kennedy Intl CLT   Charlotte Douglas Intl            2833     8
+19 JFK    John F Kennedy Intl IAD   Washington Dulles Intl            2614     9
+20 JFK    John F Kennedy Intl TPA   Tampa Intl                        2380    10
+21 LGA    La Guardia          ATL   Hartsfield Jackson Atlanta …      7795     1
+22 LGA    La Guardia          ORD   Chicago Ohare Intl                5521     2
+23 LGA    La Guardia          CLT   Charlotte Douglas Intl            4523     3
+24 LGA    La Guardia          DCA   Ronald Reagan Washington Na…      4487     4
+25 LGA    La Guardia          BOS   General Edward Lawrence Log…      4012     5
+26 LGA    La Guardia          FLL   Fort Lauderdale Hollywood I…      3951     6
+27 LGA    La Guardia          MCO   Orlando Intl                      3641     7
+28 LGA    La Guardia          DEN   Denver Intl                       3510     8
+29 LGA    La Guardia          DTW   Detroit Metro Wayne Co            3240     9
+30 LGA    La Guardia          IAH   George Bush Intercontinental      2832    10</code></pre>
+</div>
+</div>
+</section>
+<section id="rankings-of-new-york-citys-main-airports-by-mean-departure-delay" class="level2">
+<h2 class="anchored" data-anchor-id="rankings-of-new-york-citys-main-airports-by-mean-departure-delay">2.5 Rankings of New York City’s Main Airports by Mean Departure Delay</h2>
+<p>What are the rankings of New York City’s main airports in terms of mean departure delay, weighting each flight equally when taking the average? Remove flights with unknown departure delays from the analysis. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Three-letter airport code</li>
+<li>Airport name</li>
+<li>Mean departure delay in minutes</li>
+<li>Rank. The airport with the shortest mean departure delay is ranked first.</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by the three-letter airport code.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(origin) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_dep_delay =</span> <span class="fu">mean</span>(dep_delay, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(mean_dep_delay)) <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(origin <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(origin, name, mean_dep_delay, rank) <span class="sc">|&gt;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, origin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  origin name                mean_dep_delay  rank
+  &lt;chr&gt;  &lt;chr&gt;                        &lt;dbl&gt; &lt;int&gt;
+1 LGA    La Guardia                    11.3     1
+2 JFK    John F Kennedy Intl           12.3     2
+3 EWR    Newark Liberty Intl           15.3     3</code></pre>
+</div>
+</div>
+</section>
+<section id="percentage-of-on-time-flights-despite-departure-delay" class="level2">
+<h2 class="anchored" data-anchor-id="percentage-of-on-time-flights-despite-departure-delay">2.6 Percentage of On-Time Flights despite Departure Delay</h2>
+<p>What percentage of flights that experienced a departure delay of at least 30 minutes still managed to arrive on time? Remove flights with unknown departure or arrival delays from the analysis. Provide the answer as a single-element numeric vector. Confirm that the answer has the correct length and class.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>on_time_pct <span class="ot">&lt;-</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  flights <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>(<span class="fu">ends_with</span>(<span class="st">"delay"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(dep_delay <span class="sc">&gt;=</span> <span class="dv">30</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">on_time_arr =</span> arr_delay <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(on_time_arr, <span class="at">name=</span><span class="st">"n_flights"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">pct =</span> n_flights <span class="sc">/</span> <span class="fu">sum</span>(n_flights) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(on_time_arr <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(<span class="at">var =</span> pct)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>on_time_pct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.171782</code></pre>
+</div>
+</div>
+<p>Here is a confirmation that the result is a single-element numeric vector:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.numeric</span>(on_time_pct) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(on_time_pct) <span class="sc">==</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="on-time-departure-percentage-by-hour-of-the-day" class="level2">
+<h2 class="anchored" data-anchor-id="on-time-departure-percentage-by-hour-of-the-day">2.7 On-Time Departure Percentage by Hour of the Day</h2>
+<p>Tabulate the percentage of on-time departures for each hour of the day when the plane is scheduled to leave. Remove flights with unknown departure delays from the analysis. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Hour of the day</li>
+<li>Percentage of on-time departures</li>
+</ul>
+<p>Sort the results by the hour of the day. Display all hours in the output.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(dep_delay) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">on_time_dep =</span> dep_delay <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(hour, on_time_dep, <span class="at">name =</span> <span class="st">"n_flights"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hour) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_flights =</span> n_flights <span class="sc">/</span> <span class="fu">sum</span>(n_flights) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(on_time_dep <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(hour, pct_flights) <span class="sc">|&gt;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(hour) <span class="sc">|&gt;</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 19 × 2
+# Groups:   hour [19]
+    hour pct_flights
+   &lt;dbl&gt;       &lt;dbl&gt;
+ 1     5        72.9
+ 2     6        77.6
+ 3     7        77.5
+ 4     8        73.9
+ 5     9        72.8
+ 6    10        69.4
+ 7    11        67.2
+ 8    12        62.5
+ 9    13        57.0
+10    14        54.2
+11    15        48.9
+12    16        50.4
+13    17        47.4
+14    18        47.9
+15    19        46.3
+16    20        45.9
+17    21        45.2
+18    22        54.9
+19    23        41.7</code></pre>
+</div>
+</div>
+</section>
+<section id="planes-operated-by-multiple-airlines" class="level2">
+<h2 class="anchored" data-anchor-id="planes-operated-by-multiple-airlines">2.8 Planes Operated by Multiple Airlines</h2>
+<p>Which planes, identified by their tail number, were operated by more than one airline? Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Tail number</li>
+<li>Manufacturer</li>
+<li>Model</li>
+<li>Number of airlines (must be greater than 1)</li>
+</ul>
+<p>Sort the results alphabetically by tail number. Display all planes in the output.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(tailnum, carrier) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_carriers =</span> <span class="fu">n</span>(), <span class="at">.by =</span> tailnum) <span class="sc">|&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_carriers <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(planes, <span class="fu">join_by</span>(tailnum)) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tailnum, manufacturer, model, n_carriers) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(tailnum) <span class="sc">|&gt;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 17 × 4
+   tailnum manufacturer   model       n_carriers
+   &lt;chr&gt;   &lt;chr&gt;          &lt;chr&gt;            &lt;int&gt;
+ 1 N146PQ  BOMBARDIER INC CL-600-2D24          2
+ 2 N153PQ  BOMBARDIER INC CL-600-2D24          2
+ 3 N176PQ  BOMBARDIER INC CL-600-2D24          2
+ 4 N181PQ  BOMBARDIER INC CL-600-2D24          2
+ 5 N197PQ  BOMBARDIER INC CL-600-2D24          2
+ 6 N200PQ  BOMBARDIER INC CL-600-2D24          2
+ 7 N228PQ  BOMBARDIER INC CL-600-2D24          2
+ 8 N232PQ  BOMBARDIER INC CL-600-2D24          2
+ 9 N933AT  BOEING         717-200              2
+10 N935AT  BOEING         717-200              2
+11 N977AT  BOEING         717-200              2
+12 N978AT  BOEING         717-200              2
+13 N979AT  BOEING         717-200              2
+14 N981AT  BOEING         717-200              2
+15 N989AT  BOEING         717-200              2
+16 N990AT  BOEING         717-200              2
+17 N994AT  BOEING         717-200              2</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="task-3-exploring-flights-from-new-york-city-to-chicago" class="level1">
+<h1>Task 3: Exploring Flights from New York City to Chicago</h1>
+<section id="identify-chicago-airports" class="level2">
+<h2 class="anchored" data-anchor-id="identify-chicago-airports">3.1 Identify Chicago Airports</h2>
+<p>Which airport names in <code>airports.csv</code> contain the string <code>"Chicago"</code>? You may find the tidyverse’s <code>str_detect()</code> function useful for this task. Create a data frame named <code>chicago_airports</code> to save the result, including only the <code>faa</code> and <code>name</code> columns. Display the content of <code>chicago_airports</code>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>chicago_aiports <span class="ot">&lt;-</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  airports <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">str_detect</span>(name, <span class="st">"Chicago"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(faa, name)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>chicago_aiports</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  faa   name                                  
+  &lt;chr&gt; &lt;chr&gt;                                 
+1 GYY   Gary Chicago International Airport    
+2 MDW   Chicago Midway Intl                   
+3 ORD   Chicago Ohare Intl                    
+4 PWK   Chicago Executive                     
+5 RFD   Chicago Rockford International Airport</code></pre>
+</div>
+</div>
+</section>
+<section id="airlines-serving-chicago-from-new-york-city" class="level2">
+<h2 class="anchored" data-anchor-id="airlines-serving-chicago-from-new-york-city">3.2 Airlines Serving Chicago from New York City</h2>
+<p>Which airlines operated flights from New York City to Chicago? Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Two-letter airline code</li>
+<li>Airline name</li>
+<li>Number of flights</li>
+<li>Rank. The airline operating most flights is ranked first.</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by the two-letter airline code.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(name, <span class="st">"Chicago"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_flights =</span> <span class="fu">n</span>(), <span class="at">.by =</span> carrier) <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airlines, <span class="fu">join_by</span>(carrier)) <span class="sc">|&gt;</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(n_flights))) <span class="sc">|&gt;</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(carrier, name, n_flights, rank) <span class="sc">|&gt;</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, carrier)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 4
+  carrier name                     n_flights  rank
+  &lt;chr&gt;   &lt;chr&gt;                        &lt;int&gt; &lt;int&gt;
+1 UA      United Air Lines Inc.         6752     1
+2 WN      Southwest Airlines Co.        4102     2
+3 AA      American Airlines Inc.        2500     3
+4 9E      Endeavor Air Inc.              989     4
+5 B6      JetBlue Airways                898     5
+6 MQ      Envoy Air                       47     6
+7 EV      ExpressJet Airlines Inc.         2     7
+8 OO      SkyWest Airlines Inc.            1     8</code></pre>
+</div>
+</div>
+<p><strong>Prof answer</strong> -</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(chicago_aiports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(carrier, <span class="at">name =</span> <span class="st">"n_flights"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airlines, <span class="fu">join_by</span>(carrier)) <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(n_flights))) <span class="sc">|&gt;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(carrier, name, n_flights, rank) <span class="sc">|&gt;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, carrier)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 4
+  carrier name                     n_flights  rank
+  &lt;chr&gt;   &lt;chr&gt;                        &lt;int&gt; &lt;int&gt;
+1 UA      United Air Lines Inc.         6752     1
+2 WN      Southwest Airlines Co.        4102     2
+3 AA      American Airlines Inc.        2500     3
+4 9E      Endeavor Air Inc.              989     4
+5 B6      JetBlue Airways                898     5
+6 MQ      Envoy Air                       47     6
+7 EV      ExpressJet Airlines Inc.         2     7
+8 OO      SkyWest Airlines Inc.            1     8</code></pre>
+</div>
+</div>
+</section>
+<section id="on-time-arrival-percentages-by-airline" class="level2">
+<h2 class="anchored" data-anchor-id="on-time-arrival-percentages-by-airline">3.3 On-Time Arrival Percentages by Airline</h2>
+<p>Of all airlines that operated at least 100 flights from New York City to Chicago, which ones had the ten highest percentages of known on-time arrivals in Chicago? Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Two-letter airline code</li>
+<li>Airline name</li>
+<li>Percentage of on-time arrivals</li>
+<li>Rank</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by two-letter airline code.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(chicago_aiports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;=</span> <span class="dv">100</span>, <span class="at">.by =</span> carrier) <span class="sc">|&gt;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">on_time_arr =</span> arr_delay <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(carrier, on_time_arr, <span class="at">name =</span> <span class="st">"n_flights"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n_flights <span class="sc">/</span> <span class="fu">sum</span>(n_flights) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> carrier) <span class="sc">|&gt;</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(on_time_arr <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airlines, <span class="fu">join_by</span>(carrier)) <span class="sc">|&gt;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(pct))) <span class="sc">|&gt;</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(carrier, name, pct, rank) <span class="sc">|&gt;</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, carrier)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  carrier name                     pct  rank
+  &lt;chr&gt;   &lt;chr&gt;                  &lt;dbl&gt; &lt;int&gt;
+1 AA      American Airlines Inc.  67.6     1
+2 UA      United Air Lines Inc.   62.1     2
+3 9E      Endeavor Air Inc.       56.2     3
+4 B6      JetBlue Airways         52.6     4
+5 WN      Southwest Airlines Co.  52.4     5</code></pre>
+</div>
+</div>
+</section>
+<section id="top-ten-models-by-frequency" class="level2">
+<h2 class="anchored" data-anchor-id="top-ten-models-by-frequency">3.4 Top Ten Models by Frequency</h2>
+<p>What were the ten most frequent combinations of manufacturer and model used for flights from New York City to Chicago? If manufacturer-model combinations are tied for the tenth place, incorporate all of them in the output. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Manufacturer</li>
+<li>Model</li>
+<li>Number of flights</li>
+<li>Rank</li>
+</ul>
+<p>Sort the results first by rank, then alphabetically by manufacturer, and, lastly, by model.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(chicago_aiports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(planes, <span class="fu">join_by</span>(tailnum)) <span class="sc">|&gt;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(manufacturer, model, <span class="at">name =</span> <span class="st">"n_flights"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(n_flights))) <span class="sc">|&gt;</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rank, <span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="co"># or use filter(rank &lt;= 10)</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, manufacturer, model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 4
+   manufacturer      model           n_flights  rank
+   &lt;chr&gt;             &lt;chr&gt;               &lt;int&gt; &lt;int&gt;
+ 1 BOEING            737-7H4              3318     1
+ 2 AIRBUS INDUSTRIE  A319-131             1946     2
+ 3 AIRBUS INDUSTRIE  A320-232             1743     3
+ 4 MCDONNELL DOUGLAS DC-9-82(MD-82)       1433     4
+ 5 BOEING            737-824              1066     5
+ 6 BOMBARDIER INC    CL-600-2D24           987     6
+ 7 MCDONNELL DOUGLAS DC-9-83(MD-83)        701     7
+ 8 EMBRAER           ERJ 190-100 IGW       658     8
+ 9 BOEING            737-724               613     9
+10 AIRBUS            A320-232              395    10</code></pre>
+</div>
+</div>
+</section>
+<section id="top-ten-planes-by-mean-speed" class="level2">
+<h2 class="anchored" data-anchor-id="top-ten-planes-by-mean-speed">3.5 Top Ten Planes by Mean Speed</h2>
+<p>Which ten planes, among those with at least ten flights departing from New York City, exhibited the highest observed mean speed on flights to Chicago? The speed calculation considers the distance between airports and the time spent in the air, with each flight equally weighted in the average. Remove flights with unknown time spent in the air from the analysis. In the case of ties for the tenth place, ensure that all tied planes are included in the output. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Tail number</li>
+<li>Manufacturer</li>
+<li>Model</li>
+<li>Mean speed in miles per hour</li>
+<li>Rank</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by tail number.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">semi_join</span>(chicago_aiports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">speed_2 =</span> distance <span class="sc">/</span> air_time <span class="sc">*</span> <span class="dv">60</span>) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># with at least 10 flights done by the plane</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;=</span> <span class="dv">10</span>, <span class="at">.by =</span> tailnum) <span class="sc">|&gt;</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_speed =</span> <span class="fu">mean</span>(speed_2, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.by =</span> tailnum) <span class="sc">|&gt;</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(planes, <span class="fu">join_by</span>(tailnum)) <span class="sc">|&gt;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(<span class="fu">desc</span>(mean_speed))) <span class="sc">|&gt;</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rank <span class="sc">&lt;=</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tailnum, manufacturer, model, mean_speed, rank) <span class="sc">|&gt;</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, tailnum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+   tailnum manufacturer model    mean_speed  rank
+   &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;         &lt;dbl&gt; &lt;int&gt;
+ 1 N963WN  BOEING       737-7H4        409.     1
+ 2 N416WN  BOEING       737-7H4        408.     2
+ 3 N494WN  BOEING       737-7H4        405.     3
+ 4 N967WN  BOEING       737-7H4        404.     4
+ 5 N8307K  BOEING       737-8H4        404.     5
+ 6 N209WN  BOEING       737-7H4        404.     6
+ 7 N489UA  AIRBUS       A320-232       403.     7
+ 8 N417WN  BOEING       737-7H4        403.     8
+ 9 N769SW  BOEING       737-7H4        403.     9
+10 N925WN  BOEING       737-7H4        403.    10</code></pre>
+</div>
+</div>
+</section>
+<section id="were-there-daily-departures-in-october" class="level2">
+<h2 class="anchored" data-anchor-id="were-there-daily-departures-in-october">3.6 Were there daily departures in October?</h2>
+<p>Was at least one departure from New York City to Chicago scheduled every day in October 2013? Provide your answer in the form of a single-element logical vector. Confirm that the answer has the correct length and class.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>departed_daily <span class="ot">&lt;-</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  flights <span class="sc">|&gt;</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">semi_join</span>(chicago_aiports, <span class="fu">join_by</span>(dest <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(month <span class="sc">==</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(day) <span class="sc">|&gt;</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>() <span class="sc">|&gt;</span><span class="co"># this converts the resulting data into a vector</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.integer</span>() <span class="sc">|&gt;</span> <span class="co"># this converts the original double vector into an integer vector</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">31</span>) <span class="co"># this checks if the resulting vector is identical to the integer vector from 1 to 31</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>departed_daily</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p><strong>Note</strong>: Here is confirmation that the result is a single-element logical vector -</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(departed_daily) <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="fu">is.logical</span>(departed_daily)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="task-4-uncovering-associations-between-weather-and-flight-operations" class="level1">
+<h1>Task 4: Uncovering associations between weather and flight operations</h1>
+<section id="airport-hour-combinations-absent-from-the-weather-table" class="level2">
+<h2 class="anchored" data-anchor-id="airport-hour-combinations-absent-from-the-weather-table">4.1 Airport-Hour Combinations Absent from the Weather Table</h2>
+<p>How many unique combinations of origin airport and <code>time_hour</code> are present in <code>flights.csv</code> but absent from <code>weather.csv</code>? Provide your answer in the form of a single-element numeric vector. Confirm that the answer has the correct length and class.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>uniqueComb <span class="ot">&lt;-</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  flights <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(origin, time_hour) <span class="sc">|&gt;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">anti_join</span>(weather, <span class="fu">join_by</span>(origin, time_hour)) <span class="sc">|&gt;</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(origin, <span class="at">name =</span> <span class="st">"n_combination"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="fu">sum</span>(n_combination)) <span class="sc">|&gt;</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>()</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>uniqueComb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 101</code></pre>
+</div>
+</div>
+<p><strong>Prof ans </strong> -</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>n_absent <span class="ot">&lt;-</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  flights <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(origin, time_hour) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">anti_join</span>(weather, <span class="fu">join_by</span>(origin, time_hour)) <span class="sc">|&gt;</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>()</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>n_absent</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 101</code></pre>
+</div>
+</div>
+<p><strong>Note</strong>: Here is confirmation that the result is correct length and class</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(uniqueComb) <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="fu">is.numeric</span>(uniqueComb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(n_absent) <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="fu">is.numeric</span>(n_absent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="on-time-departures-by-airport-and-precipitation" class="level2">
+<h2 class="anchored" data-anchor-id="on-time-departures-by-airport-and-precipitation">4.2 On-time Departures by Airport and Precipitation</h2>
+<p>What is the percentage of on-time departures from each of New York City’s main airports under dry conditions (i.e., precip = 0) and under wet conditions? Remove flights from the analysis if the delay or precipitation at departure is unknown. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Three-letter airport code</li>
+<li>Airport name</li>
+<li><code>is_dry</code>: Logical values indicating zero precipitation.</li>
+<li>Percentage of on-time departures</li>
+</ul>
+<p>First, sort the results alphabetically by the three-letter airport code and, then, by the presence of precipitation (with dry conditions appearing before wet ones).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(weather, <span class="fu">join_by</span>(origin, time_hour)) <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(precip, dep_delay) <span class="sc">|&gt;</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">is_dry =</span> precip <span class="sc">==</span> <span class="dv">0</span>, <span class="at">on_time_dep =</span> dep_delay <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(origin, is_dry, on_time_dep, <span class="at">name =</span> <span class="st">"n_flights"</span>) <span class="sc">|&gt;</span> <span class="co"># count the number of flights by origin, is_dry, and on_time_dep</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_flights =</span> n_flights <span class="sc">/</span> <span class="fu">sum</span>(n_flights) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> <span class="fu">c</span>(origin, is_dry)) <span class="sc">|&gt;</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(on_time_dep <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(origin <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(origin, name, is_dry, pct_flights) <span class="sc">|&gt;</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(origin, <span class="fu">desc</span>(is_dry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  origin name                is_dry pct_flights
+  &lt;chr&gt;  &lt;chr&gt;               &lt;lgl&gt;        &lt;dbl&gt;
+1 EWR    Newark Liberty Intl TRUE          56.0
+2 EWR    Newark Liberty Intl FALSE         37.5
+3 JFK    John F Kennedy Intl TRUE          62.5
+4 JFK    John F Kennedy Intl FALSE         44.3
+5 LGA    La Guardia          TRUE          66.9
+6 LGA    La Guardia          FALSE         43.2</code></pre>
+</div>
+</div>
+</section>
+<section id="rank-airports-by-low-visibility-departure-delays" class="level2">
+<h2 class="anchored" data-anchor-id="rank-airports-by-low-visibility-departure-delays">4.3 Rank Airports by Low-Visibility Departure Delays</h2>
+<p>How do New York City’s main airports rank in terms of mean departure delay when the visibility was less than one mile? Remove flights with unknown departure delays from the analysis. Include columns for the following attributes in exactly this order:</p>
+<ul>
+<li>Three-letter airport code</li>
+<li>Airport name</li>
+<li>Mean departure delay in minutes</li>
+<li>Rank. The airport with the shortest mean departure delay is ranked first.</li>
+</ul>
+<p>Sort the results first by rank and, then, alphabetically by the three-letter airport code.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(weather, <span class="fu">join_by</span>(origin, time_hour)) <span class="sc">|&gt;</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(dep_delay) <span class="sc">|&gt;</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(visib <span class="sc">&lt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_dep_delay =</span> <span class="fu">mean</span>(dep_delay), <span class="at">.by =</span> origin) <span class="sc">|&gt;</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(airports, <span class="fu">join_by</span>(origin <span class="sc">==</span> faa)) <span class="sc">|&gt;</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">min_rank</span>(mean_dep_delay)) <span class="sc">|&gt;</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(origin, name, mean_dep_delay, rank) <span class="sc">|&gt;</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rank, origin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  origin name                mean_dep_delay  rank
+  &lt;chr&gt;  &lt;chr&gt;                        &lt;dbl&gt; &lt;int&gt;
+1 LGA    La Guardia                    27.8     1
+2 JFK    John F Kennedy Intl           29.0     2
+3 EWR    Newark Liberty Intl           33.4     3</code></pre>
+</div>
+</div>
+</section>
+<section id="correlation-between-temperature-and-departure-delay" class="level2">
+<h2 class="anchored" data-anchor-id="correlation-between-temperature-and-departure-delay">4.4 Correlation between Temperature and Departure Delay</h2>
+<p>What is the correlation coefficient between the mean temperature of the day and the mean departure delay on that day? Remove flights from the analysis if the temperature or departure delay is unknown. Provide the answer in the form of a single-element numeric vector. Confirm that the answer has the correct length and class.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>corr <span class="ot">&lt;-</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  flights <span class="sc">|&gt;</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(weather, <span class="fu">join_by</span>(origin, year, month, day, time_hour)) <span class="sc">|&gt;</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>(temp, dep_delay) <span class="sc">|&gt;</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">mean_temp =</span> <span class="fu">mean</span>(temp), <span class="at">mean_dep_delay =</span> <span class="fu">mean</span>(dep_delay), <span class="at">.by =</span> <span class="fu">c</span>(year, month, day)) <span class="sc">|&gt;</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">cor =</span> <span class="fu">cor</span>(mean_temp, mean_dep_delay)) <span class="sc">|&gt;</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>()</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>corr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1481848</code></pre>
+</div>
+</div>
+<p><strong>Note</strong>: Here is confirmation that corr is a single-element numeric vector -</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(corr) <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="fu">is.numeric</span>(corr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

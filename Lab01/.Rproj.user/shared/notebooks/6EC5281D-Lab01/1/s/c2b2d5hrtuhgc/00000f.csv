@@ -1,0 +1,4 @@
+"0","flights |>"
+"0","  distinct(origin, dest)|> # keep only unique rows"
+"0","  count(origin, name = ""n_dest"")|> # count the number of unique destinations"
+"0","  left_join(airports, join_by(origin == faa)) # join dataframes"
