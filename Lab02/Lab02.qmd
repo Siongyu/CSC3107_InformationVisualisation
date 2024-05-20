@@ -1,0 +1,387 @@
+---
+title: "Lab02"
+format: html
+editor: visual
+---
+
+# 1 Introduction (Loading required packages)
+
+```{r}
+#| message: false
+#| label: setup-packages
+
+library(tidyverse)
+library(gt)
+```
+
+# 2 Reconstructing the Table in the ASEAN Statistical Yearbook
+
+## 2.1 Pivot the Data
+
+Asean Meat Production Data:
+
+```{r}
+#| message: false
+#| label: import-asean-meat-production
+#| code-fold: true
+
+asean <- read_csv("asean_meat_production.csv")
+gt_preview(asean)
+```
+
+In order to pivot the data such that each column represent a country:
+
+```{r}
+#| message: false
+#| label: pivot-asean-meat-production-via-country
+#| code-fold: true
+
+asean <- 
+  asean |>
+  pivot_wider(names_from = country,values_from = kt)
+
+asean |>
+  gt_preview() |>
+  tab_options(
+    table.font.size = px(9),
+    quarto.disable_processing = TRUE
+  )
+```
+
+## 2.2 Append ASEAN Column
+
+In order to append a new column named "ASEAN"
+
+```{r}
+#| message: false
+#| label: append-asean-column
+#| code-fold: true
+
+asean <-
+  asean |>
+  rowwise() |>
+  mutate(ASEAN = sum(c_across(`Brunei Darussalam`:`Viet Nam`), na.rm = TRUE))
+
+asean |>
+  gt_preview() |>
+  tab_options(table.font.size = px(9), quarto.disable_processing = TRUE)
+```
+
+## 2.3 Insert Livestock and Poultry Rows
+
+Insertion of livestock and poultry rows:
+
+```{r}
+#| message: false
+#| label: insert-livestock-poultry-rows
+#| code-fold: true
+
+asean <-
+  asean |>
+  pivot_wider(
+    names_from = year,
+    values_from = `Brunei Darussalam`:ASEAN
+  ) |>
+  add_row(meat = "Livestock production", .before = 1) |>
+  add_row(meat = "Poultry production", .before = 5) |>
+  pivot_longer(
+    -meat,
+    names_to = "country_year",
+    values_to = "kt"
+  ) |>
+  separate_wider_delim(
+    country_year,
+    delim = "_",
+    names = c("country", "year"),
+  ) |>
+  pivot_wider(names_from = country, values_from = kt)
+asean |>
+  gt_preview(bottom_n = 9) |>
+  tab_options(table.font.size = px(9), quarto.disable_processing = TRUE)
+```
+
+## 2.4 Create Basic gt Table
+
+```{r}
+#| message: false
+#| label: create-basic-gt-table
+#| code-fold: true
+
+gt_asean_meat_production <-
+  asean |>
+  gt(rowname_col = "meat", groupname_col = "year") |>
+  tab_options(
+    table.font.size = px(9),
+    quarto.disable_processing = TRUE
+  )
+
+gt_asean_meat_production
+```
+
+## 2.5 Add Annotations
+
+Adding annotation to the table
+
+```{r}
+#| message: false
+#| label: add-annotations-to-gt-table
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_header(
+    title = "Livestock and Poultry Meat Production in ASEAN, 2018 - 2021",
+    subtitle = "(in thousand metric ton)"
+  ) |>
+  tab_stubhead(
+    label = "Animal Type"
+  ) |>
+  tab_footnote(
+    footnote = md("***Note:*** '-' not available at the time of publication")
+  ) |>
+  tab_source_note(
+    source_note = md("***Source:*** FAOSTAT database")
+  )
+
+gt_asean_meat_production
+```
+
+## 2.6 Format Numbers
+
+```{r}
+#| message: false
+#| label: format-numbers
+#| code-fold: true
+
+gt_asean_meat_production <- fmt_number(
+  gt_asean_meat_production,
+  columns = `Brunei Darussalam`:ASEAN,
+  decimals = 1
+)
+gt_asean_meat_production
+```
+
+## 2.7 Substitute Strings for Missing Data
+
+```{r}
+#| message: false
+#| label: substitute-strings-for-missing-data
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  sub_missing(
+    rows = meat %in% c("Livestock production", "Poultry production"),
+    missing_text = ""
+  ) |>
+  sub_missing( # Override the default in "production" rows
+    rows = !(meat %in% c("Livestock production", "Poultry production")),
+    missing_text = "-"
+  )
+gt_asean_meat_production
+```
+
+## 2.8 Adjust Stub Width
+
+```{r}
+#| message: false
+#| label: adjust-stub-width
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  cols_width(
+    stub() ~ px(120)
+  )
+
+gt_asean_meat_production
+```
+
+## 2.9 Add Summary Rows
+
+For each year, the table in Figure 1.1 displays a summary row containing the total meat production in each column, excluding missing values from the summation. Add these rows to the preliminary table, displaying the number using one decimal and a comma as thousands separator. At this stage, your table should look as follows:
+
+```{r}
+#| message: false
+#| label: add-summary-rows
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  summary_rows(
+    fns = "Total meat production" ~ sum(., na.rm = TRUE),
+    fmt = ~ fmt_number(., decimals = 1, use_seps = TRUE, sep_mark = ",")
+  )
+
+gt_asean_meat_production
+```
+
+---
+
+# 3 Styling the Table
+
+## 3.1 Style the Header
+
+```{r}
+#| message: false
+#| label: style-header
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_style(
+    style = cell_text(size = px(12), weight = "bold"),
+    locations = cells_title(groups="title")
+  ) |>
+  tab_style(
+    style = cell_text(align = "right"),
+    locations = cells_title(groups="subtitle")
+  )
+  
+
+gt_asean_meat_production
+```
+
+## 3.2 Style the Stubhead and Column Labels
+
+```{r}
+#| message: false
+#| label: style-stubhead-column-labels
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_style(
+    style = list(
+      cell_fill(color = "#336636"),
+      cell_text(align="center", v_align="middle", color="white", weight="bold"),
+      cell_borders(color="white")
+    ),
+    locations = list(cells_stubhead(), cells_column_labels())
+  )
+
+gt_asean_meat_production
+```
+
+## 3.3 Style the Row-Group Labels for the Years
+
+```{r}
+#| message: false
+#| label: style-row-group-labels-for-the-years
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_style(
+    style = list(
+      cell_text(weight="bold", color="white"),
+      cell_fill(color="#478846")
+    ),
+    locations = cells_row_groups()
+  )
+
+gt_asean_meat_production
+```
+
+## 3.4 Style the Row-Group Labels for Livestock and Poultry Production
+
+```{r}
+#| message: false
+#| label: style-row-group-labels-for-livestock-poultry-production
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_style(
+    style = list(
+      cell_fill(color = "#bfdeaf"),
+      cell_text(weight = "bold"),
+      cell_borders(style="hidden")
+    ),
+    locations = list(
+      cells_body(rows = str_ends(meat,"production")),
+      cells_stub(rows = str_ends(meat, "production"))
+    )
+  )
+
+
+gt_asean_meat_production
+```
+
+## 3.5 Style the Summary Labels and Summary Cells
+
+```{r}
+#| message: false
+#| label: style-summary-labels-summary-cells
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_style(
+    style = list(
+      cell_fill(color = "#478846"),
+      cell_text(color = "white", weight = "bold"),
+      cell_borders(color = "white")
+    ),
+    locations = list(
+      cells_stub_summary(),
+      cells_summary()
+    )
+  )
+
+gt_asean_meat_production
+```
+
+## 3.6 Style All Other Cells
+```{r}
+#| message: false
+#| label: style-all-other-cells
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_style(
+    style = list(cell_fill(color = "#ebf4ec"), cell_borders(color = "white")),
+    locations = list(
+      cells_body(
+        rows = meat %in% c(
+          "Beef and Buffalo Meat",
+          "Mutton and Goat Meat",
+          "Poultry meat"
+        )
+      ),
+      cells_stub(
+        rows = meat %in% c(
+          "Beef and Buffalo Meat",
+          "Mutton and Goat Meat",
+          "Poultry meat"
+        )
+      )
+    )
+  ) |>
+  tab_style(
+    style = list(cell_fill(color = "#d5e9d4"), cell_borders(color = "white")),
+    locations = list(
+      cells_body(rows = meat == "Pig meat"),
+      cells_stub(rows = meat == "Pig meat")
+    )
+  )
+gt_asean_meat_production
+```
+
+## 3.7 Reduce Padding
+```{r}
+#| message: false
+#| label: reduce-padding
+#| code-fold: true
+
+gt_asean_meat_production <-
+  gt_asean_meat_production |>
+  tab_options(
+    row_group.padding = px(4),
+    data_row.padding = px(4),
+    summary_row.padding = px(4)
+  )
+gt_asean_meat_production
+```
+

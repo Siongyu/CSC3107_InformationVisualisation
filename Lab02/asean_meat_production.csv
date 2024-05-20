@@ -1,0 +1,161 @@
+year,meat,country,kt
+2021,Beef and Buffalo Meat,Brunei Darussalam,4.26741
+2021,Beef and Buffalo Meat,Cambodia,59.52424
+2021,Beef and Buffalo Meat,Indonesia,458.755
+2021,Beef and Buffalo Meat,Lao PDR,61.30639
+2021,Beef and Buffalo Meat,Malaysia,40.8455
+2021,Beef and Buffalo Meat,Myanmar,136.89796
+2021,Beef and Buffalo Meat,Philippines,182.72524
+2021,Beef and Buffalo Meat,Singapore,0.03425
+2021,Beef and Buffalo Meat,Thailand,154.55376
+2021,Beef and Buffalo Meat,Viet Nam,347.52345
+2021,Pig meat,Brunei Darussalam,0.03135
+2021,Pig meat,Cambodia,107.36374
+2021,Pig meat,Indonesia,323.67
+2021,Pig meat,Lao PDR,101.55963
+2021,Pig meat,Malaysia,219.1786
+2021,Pig meat,Myanmar,285
+2021,Pig meat,Philippines,1187.30473
+2021,Pig meat,Singapore,31.251
+2021,Pig meat,Thailand,927.71694
+2021,Pig meat,Viet Nam,2590
+2021,Mutton and Goat Meat,Brunei Darussalam,0.07094
+2021,Mutton and Goat Meat,Cambodia,NA
+2021,Mutton and Goat Meat,Indonesia,117.588
+2021,Mutton and Goat Meat,Lao PDR,2.82604
+2021,Mutton and Goat Meat,Malaysia,3.61892
+2021,Mutton and Goat Meat,Myanmar,12
+2021,Mutton and Goat Meat,Philippines,32.25285
+2021,Mutton and Goat Meat,Singapore,0.03333
+2021,Mutton and Goat Meat,Thailand,2.12822
+2021,Mutton and Goat Meat,Viet Nam,21.34914
+2021,Poultry meat,Brunei Darussalam,31.59257
+2021,Poultry meat,Cambodia,27.75546
+2021,Poultry meat,Indonesia,3888.544
+2021,Poultry meat,Lao PDR,43.18854
+2021,Poultry meat,Malaysia,1625.4525
+2021,Poultry meat,Myanmar,682.5421
+2021,Poultry meat,Philippines,1367.57174
+2021,Poultry meat,Singapore,84.80303
+2021,Poultry meat,Thailand,1844.91049
+2021,Poultry meat,Viet Nam,1702.91419
+2020,Beef and Buffalo Meat,Brunei Darussalam,2.393
+2020,Beef and Buffalo Meat,Cambodia,61.238
+2020,Beef and Buffalo Meat,Indonesia,540.503
+2020,Beef and Buffalo Meat,Lao PDR,59.01
+2020,Beef and Buffalo Meat,Malaysia,43.493
+2020,Beef and Buffalo Meat,Myanmar,511.724
+2020,Beef and Buffalo Meat,Philippines,174.768
+2020,Beef and Buffalo Meat,Singapore,0.035
+2020,Beef and Buffalo Meat,Thailand,132.043
+2020,Beef and Buffalo Meat,Viet Nam,470.343
+2020,Pig meat,Brunei Darussalam,0.031
+2020,Pig meat,Cambodia,93.196
+2020,Pig meat,Indonesia,241.354
+2020,Pig meat,Lao PDR,97.575
+2020,Pig meat,Malaysia,221.325
+2020,Pig meat,Myanmar,1127.135
+2020,Pig meat,Philippines,1499.853
+2020,Pig meat,Singapore,27.765
+2020,Pig meat,Thailand,893.5
+2020,Pig meat,Viet Nam,3550.105
+2020,Mutton and Goat Meat,Brunei Darussalam,0.061
+2020,Mutton and Goat Meat,Cambodia,NA
+2020,Mutton and Goat Meat,Indonesia,136.747
+2020,Mutton and Goat Meat,Lao PDR,2.71
+2020,Mutton and Goat Meat,Malaysia,4.026
+2020,Mutton and Goat Meat,Myanmar,126.746
+2020,Mutton and Goat Meat,Philippines,31.673
+2020,Mutton and Goat Meat,Singapore,0.023
+2020,Mutton and Goat Meat,Thailand,2.009
+2020,Mutton and Goat Meat,Viet Nam,21.322
+2020,Poultry meat,Brunei Darussalam,26.566
+2020,Poultry meat,Cambodia,27.179
+2020,Poultry meat,Indonesia,3752.238
+2020,Poultry meat,Lao PDR,40.579
+2020,Poultry meat,Malaysia,1597.527
+2020,Poultry meat,Myanmar,1699.817
+2020,Poultry meat,Philippines,1417.971
+2020,Poultry meat,Singapore,99.756
+2020,Poultry meat,Thailand,1843.774
+2020,Poultry meat,Viet Nam,1319.238
+2019,Beef and Buffalo Meat,Brunei Darussalam,1.603
+2019,Beef and Buffalo Meat,Cambodia,61.755
+2019,Beef and Buffalo Meat,Indonesia,529.591
+2019,Beef and Buffalo Meat,Lao PDR,57.193
+2019,Beef and Buffalo Meat,Malaysia,44.025
+2019,Beef and Buffalo Meat,Myanmar,483.211
+2019,Beef and Buffalo Meat,Philippines,200.643
+2019,Beef and Buffalo Meat,Singapore,0.035
+2019,Beef and Buffalo Meat,Thailand,162.905
+2019,Beef and Buffalo Meat,Viet Nam,449.767
+2019,Pig meat,Brunei Darussalam,0.032
+2019,Pig meat,Cambodia,92.96
+2019,Pig meat,Indonesia,236.277
+2019,Pig meat,Lao PDR,93.109
+2019,Pig meat,Malaysia,222.791
+2019,Pig meat,Myanmar,1092.708
+2019,Pig meat,Philippines,1607.656
+2019,Pig meat,Singapore,22.852
+2019,Pig meat,Thailand,895.38
+2019,Pig meat,Viet Nam,3328.822
+2019,Mutton and Goat Meat,Brunei Darussalam,0.048
+2019,Mutton and Goat Meat,Cambodia,NA
+2019,Mutton and Goat Meat,Indonesia,142.925
+2019,Mutton and Goat Meat,Lao PDR,2.559
+2019,Mutton and Goat Meat,Malaysia,4.2
+2019,Mutton and Goat Meat,Myanmar,135.348
+2019,Mutton and Goat Meat,Philippines,33.715
+2019,Mutton and Goat Meat,Singapore,0.023
+2019,Mutton and Goat Meat,Thailand,1.994
+2019,Mutton and Goat Meat,Viet Nam,20.993
+2019,Poultry meat,Brunei Darussalam,24.813
+2019,Poultry meat,Cambodia,27.895
+2019,Poultry meat,Indonesia,3975.489
+2019,Poultry meat,Lao PDR,38.203
+2019,Poultry meat,Malaysia,1655.293
+2019,Poultry meat,Myanmar,1644.027
+2019,Poultry meat,Philippines,1508.91
+2019,Poultry meat,Singapore,99.772
+2019,Poultry meat,Thailand,1804.397
+2019,Poultry meat,Viet Nam,1144.554
+2018,Beef and Buffalo Meat,Brunei Darussalam,0.718
+2018,Beef and Buffalo Meat,Cambodia,66.688
+2018,Beef and Buffalo Meat,Indonesia,563.161
+2018,Beef and Buffalo Meat,Lao PDR,53.371
+2018,Beef and Buffalo Meat,Malaysia,51.301
+2018,Beef and Buffalo Meat,Myanmar,469.88
+2018,Beef and Buffalo Meat,Philippines,310.72
+2018,Beef and Buffalo Meat,Singapore,0.047
+2018,Beef and Buffalo Meat,Thailand,151.73
+2018,Beef and Buffalo Meat,Viet Nam,426.582
+2018,Pig meat,Brunei Darussalam,0.05
+2018,Pig meat,Cambodia,86.48
+2018,Pig meat,Indonesia,327.215
+2018,Pig meat,Lao PDR,70.345
+2018,Pig meat,Malaysia,186.012
+2018,Pig meat,Myanmar,1063.087
+2018,Pig meat,Philippines,1873.063
+2018,Pig meat,Singapore,18.508
+2018,Pig meat,Thailand,999.227
+2018,Pig meat,Viet Nam,3816.414
+2018,Mutton and Goat Meat,Brunei Darussalam,0.06
+2018,Mutton and Goat Meat,Cambodia,NA
+2018,Mutton and Goat Meat,Indonesia,115.533
+2018,Mutton and Goat Meat,Lao PDR,1.964
+2018,Mutton and Goat Meat,Malaysia,3.154
+2018,Mutton and Goat Meat,Myanmar,99.476
+2018,Mutton and Goat Meat,Philippines,60.672
+2018,Mutton and Goat Meat,Singapore,0.036
+2018,Mutton and Goat Meat,Thailand,2.144
+2018,Mutton and Goat Meat,Viet Nam,8.992
+2018,Poultry meat,Brunei Darussalam,25.3
+2018,Poultry meat,Cambodia,27.286
+2018,Poultry meat,Indonesia,2588.164
+2018,Poultry meat,Lao PDR,30.838
+2018,Poultry meat,Malaysia,1873.037
+2018,Poultry meat,Myanmar,1896.358
+2018,Poultry meat,Philippines,1379.818
+2018,Poultry meat,Singapore,106.75
+2018,Poultry meat,Thailand,1779.843
+2018,Poultry meat,Viet Nam,947.018
