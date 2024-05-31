@@ -1,0 +1,292 @@
+---
+title: "Lab04"
+format: html
+editor: visual
+theme: lux
+---
+
+# 1. Introduction
+
+## 1.1 Load necessary libraries
+
+```{r}
+#| label: setup
+#| message: false
+#| code-fold: true
+
+library(tidyverse)
+library(astsa)
+library(palmerpenguins)
+library(ggbeeswarm)
+library(ggmosaic)
+```
+
+# 2. Visualizing the Distribution of Quantitative Data: Bill Lengths of Pygoscelis Penguins
+
+## 2.1 Remove Missing Values
+
+```{r}
+#| label: remove_na
+#| message: false
+#| code-fold: true
+
+penguins <- 
+  filter(penguins, !is.na(bill_length_mm))
+
+# to ensure bill_length_mm column is clean of missing values
+is.na(penguins$bill_length_mm) |> sum() > 0
+```
+
+## 2.2 Scatter Plot of Species versus Bill Length
+
+```{r}
+#| label: scatter_plot
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, y=species)) +
+  geom_point() +
+  labs(
+    title="Scatter Plot of Species versus Bill Length",
+    x="Bill Length (mm)",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+## 2.3 Why Should You Jitter the Plot?
+
+```{r}
+#| label: jitter_plot_question
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, y=species)) +
+  geom_point(position="jitter") +
+  labs(
+    title="Species versus Bill Length",
+    x="Bill Length (mm)",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+**Note: -** In a scatter plot, data are packed together hence with jittering the plot, the data points are more spread out. This makes it easier to see the distribution. X-coord being the bill length while Y-coord being the species
+
+## 2.4 Jitter Plot
+
+```{r}
+#| label: jitter_plot
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, y=species)) +
+  geom_jitter(alpha=0.5, width=0.6, height=0.3) +
+  labs(
+    title="Jitter Plot of Species versus Bill Length",
+    x="Bill Length (mm)",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+## 2.5 Bee-Swarm Plot
+
+```{r}
+#| label: bee_swarm_plot
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, y=species)) +
+  geom_beeswarm() +
+  labs(
+    title="Beeswarm Plot of Species versus Bill Length",
+    x="Bill Length (mm)",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+## 2.6 Pros and Cons of Bee-Swarm Plots
+
+**Advantage:** - Bee-Swarm plots are useful for visualizing the distribution of a quantitative variable across different categories. They are especially useful when the number of data points is large.<br> 
+**Disadvantage:** - Bee-Swarm plots can be computationally expensive to create and may not be suitable for very large datasets. With large datasets, meaning there will be a lot of data points, the data points being like a bee will be overlapped and hence the plot will be hard to interpret.
+
+## 2.7 Violin Plot with Boxes
+
+```{r}
+#| label: violin_plot_with_boxes
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, y=species)) +
+  geom_boxplot() +
+  geom_violin(fill="lightblue", alpha=0.2) +
+  labs(
+    title="Violin Plot with Box Plot of Species versus Bill Length",
+    x="Bill Length (mm)",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+## 2.8 Frequency Polygons with Rug Plot
+
+```{r}
+#| label: frequency_polygons_with_rug_plot
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, color=species)) +
+  geom_freqpoly(bins=20) +
+  geom_rug(aes(y=0), position=position_jitter(height=0) ) +
+  labs(
+    title="Frequency Polygons with Rug Plot of Bill Length",
+    x="Bill Length (mm)",
+    y="Frequency",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+## 2.9 Faceted Frequency Polygons with Rug Plots
+
+```{r}
+#| label: faceted_frequency_polygons_with_rug_plots
+#| message: false
+#| code-fold: true
+
+ggplot(penguins, aes(x=bill_length_mm, color=species)) +
+  geom_freqpoly(bins=20) +
+  geom_rug(aes(y=0), position=position_jitter(height=0) ) +
+  facet_wrap(~species, ncol=1) +
+  labs(
+    title="Faceted Frequency Polygons with Rug Plots of Bill Length",
+    x="Bill Length (mm)",
+    y="Frequency",
+    caption="Source: Gorman et al. (2014)"
+  )
+```
+
+## 2.10 Pro and Con of Faceting
+
+**Advantage:** - Faceting allows you to compare the distribution of a quantitative variable across different categories. This can be useful for identifying patterns or trends that may not be apparent when the data are combined.<br> 
+**Disadvantage:** - Faceting is not recommended for time series data when doing a comparison of how the trendline moves over time. Combining each line into one coordinate system will make it easier to see the comparison.
+
+## 2.11 Unmarked Bonus Question: Pairwise *t*-Test
+
+```{r}
+#| label: mean_bill_length
+#| message: false
+#| code-fold: true
+
+penguins_new <- 
+  penguins |>
+  group_by(species) |>
+  mutate(mean_bill_length = mean(bill_length_mm, na.rm = TRUE)) |>
+  distinct(species, mean_bill_length) 
+
+# show mean bill length of each species
+penguins_new
+```
+
+***Note:*** As seen in the tibble above, the smallest mean bill length is Adelie's penguin.
+
+```{r}
+#| label: pairwise_t_test
+#| message: false
+#| code-fold: true
+
+# Clean the data
+penguins_clean <- penguins |>
+  filter(!is.na(bill_length_mm) & !is.na(species))
+
+# Perform pairwise t-test
+pairwise_results <- pairwise.t.test(
+  penguins_clean$bill_length_mm,
+  penguins_clean$species,
+  p.adjust.method = "none"
+)
+
+p_values <- pairwise_results$p.value
+p_values
+alpha <- 0.05
+significant_comparisons <- p_values < alpha
+significant_comparisons
+```
+
+------------------------------------------------------------------------
+
+# 3 Visualizing the Distribution of Categorical Data: Travelers on the Titanic
+
+```{r}
+#| label: load_titanic
+#| message: false
+#| code-fold: true
+
+titanic <- read_csv("titanic.csv")
+```
+
+## 3.1 Bar Chart of Travelers by Class
+
+```{r}
+#| label: bar_chart
+#| message: false
+#| code-fold: true
+
+titanic_new <-
+  titanic |>
+  group_by(class) |>
+  summarize(count = n())
+
+ggplot(titanic_new, aes(x=count, y=class)) +
+  geom_col(fill=NA, color="black", just=0.5) +
+  geom_text(aes(label=count), hjust=-0.2) +
+  labs(
+    title="Titanic Travelers by Class",
+    x="Traveler Count",
+    caption="Source: Encyclopedia Titanica (2023)"
+  )
+```
+
+## 3.2 Dodged Bar Chart of Travelers by Class and Survival
+
+```{r}
+#| labeL: dodged_bar_chart
+#| message: false
+#| code-fold: true
+
+titanic_new <-
+  titanic |>
+  group_by(class, survived) |>
+  summarize(count = n())
+
+ggplot(titanic_new, aes(x=count, y=class, fill=survived)) +
+  geom_col(position="dodge") +
+  geom_text(aes(label=count, color=survived), position=position_dodge(width=0.9), vjust=0.5, hjust=-0.03) +
+  labs(
+    title="Titanic Travelers by Class and Survival",
+    x="Traveler Count",
+    caption="Source: Encyclopedia Titanica (2023)"
+  )
+```
+
+## 3.3 Mosaic Plot
+
+```{r}
+#| label: mosaic_plot
+#| message: false
+#| warning: false
+#| code-fold: true
+
+p <- ggplot(titanic) +
+  geom_mosaic(aes(x = product(class), fill = survived)) +
+  geom_mosaic_text(aes(x = ""))
+
+p + geom_text(data = ggplot_build(p)$data[[1]],
+              aes(x = (xmin+xmax)/2, y = (ymin+ymax)/2, label = .wt)) +
+  labs(title = "Titanic Travelers by Class and Survival",
+        x = "Class",
+        y = "Survived",
+       caption = "Source: Encyclopedia Titanica (2023)") +
+  scale_fill_discrete(guide = "none")
+
+```
+
+## 3.4 Pros and Cons of Mosaic Plots
+
+**Advantage:** - The mosaic plot provides a clearer view of how survival rates vary across passenger classes, making comparisons easier.<br> **Disadvantage:** - It might not give as precise numerical information as a dodged bar chart.
