@@ -24,7 +24,7 @@ library(ggmosaic)
 # 2. Visualizing the Distribution of Quantitative Data: Bill Lengths of Pygoscelis Penguins
 
 ## 2.1 Remove Missing Values
-
+Remove the penguins with missing bill length measurements from the `penguins` tibble to avoid ggplot2 warning messages in subsequent tasks.
 ```{r}
 #| label: remove_na
 #| message: false
@@ -38,7 +38,7 @@ is.na(penguins$bill_length_mm) |> sum() > 0
 ```
 
 ## 2.2 Scatter Plot of Species versus Bill Length
-
+Create a scatter plot displaying bill length on the x-axis and species on the y-axis. For this task and all subsequent ones, customize the axis labels and add a plot title. Additionally, include a plot caption attributing the source as “Gorman et al. (2014)”.
 ```{r}
 #| label: scatter_plot
 #| message: false
@@ -54,7 +54,7 @@ ggplot(penguins, aes(x=bill_length_mm, y=species)) +
 ```
 
 ## 2.3 Why Should You Jitter the Plot?
-
+Which feature of the data suggests that jittering the scatter plot might be beneficial? (Hint: Show that individuals cannot be uniquely identified by their bill length and species.)
 ```{r}
 #| label: jitter_plot_question
 #| message: false
@@ -72,7 +72,7 @@ ggplot(penguins, aes(x=bill_length_mm, y=species)) +
 **Note: -** In a scatter plot, data are packed together hence with jittering the plot, the data points are more spread out. This makes it easier to see the distribution. X-coord being the bill length while Y-coord being the species
 
 ## 2.4 Jitter Plot
-
+Create a jitter plot displaying bill length on the x-axis and species on the y-axis. Reduce the opacity of the points and adjust the `width` and `height` arguments so that points are only jittered in the y-direction while ensuring that the points for different species are clearly separated.
 ```{r}
 #| label: jitter_plot
 #| message: false
@@ -88,7 +88,7 @@ ggplot(penguins, aes(x=bill_length_mm, y=species)) +
 ```
 
 ## 2.5 Bee-Swarm Plot
-
+Use the `geom_beeswarm()` function from the ggbeeswarm package to produce a bee-swarm plot illustrating the distribution of bill lengths for each species. Display bill length on the x-axis and species on the y-axis.
 ```{r}
 #| label: bee_swarm_plot
 #| message: false
@@ -104,12 +104,12 @@ ggplot(penguins, aes(x=bill_length_mm, y=species)) +
 ```
 
 ## 2.6 Pros and Cons of Bee-Swarm Plots
+> State one advantage and one disadvantage of using a bee-swarm plot rather than a jitter plot for these data?
 
-**Advantage:** - Bee-Swarm plots are useful for visualizing the distribution of a quantitative variable across different categories. They are especially useful when the number of data points is large.<br> 
-**Disadvantage:** - Bee-Swarm plots can be computationally expensive to create and may not be suitable for very large datasets. With large datasets, meaning there will be a lot of data points, the data points being like a bee will be overlapped and hence the plot will be hard to interpret.
+**Advantage: -** Bee-Swarm plots are useful for visualizing the distribution of a quantitative variable across different categories. They are especially useful when the number of data points is large.<br> **Disadvantage: -** Bee-Swarm plots can be computationally expensive to create and may not be suitable for very large datasets. With large datasets, meaning there will be a lot of data points, the data points being like a bee will be overlapped and hence the plot will be hard to interpret.
 
 ## 2.7 Violin Plot with Boxes
-
+Combine a violin plot and a box plot in one graph. The plot should display bill length on the x-axis and species on the y-axis.
 ```{r}
 #| label: violin_plot_with_boxes
 #| message: false
@@ -126,7 +126,7 @@ ggplot(penguins, aes(x=bill_length_mm, y=species)) +
 ```
 
 ## 2.8 Frequency Polygons with Rug Plot
-
+Display the bill-length distribution of each species as a frequency polygon, using a bin width of your choice. Combine all three frequency polygons into one coordinate system using a color aesthetic. Place a rug plot below the x-axis to show the distribution of individual data points with corresponding colors.
 ```{r}
 #| label: frequency_polygons_with_rug_plot
 #| message: false
@@ -144,7 +144,7 @@ ggplot(penguins, aes(x=bill_length_mm, color=species)) +
 ```
 
 ## 2.9 Faceted Frequency Polygons with Rug Plots
-
+Produce a faceted plot that displays the bill-length distribution of each species in a separate facet, using the same bin width as in the previous task. Add a rug plot below each frequency polygon.
 ```{r}
 #| label: faceted_frequency_polygons_with_rug_plots
 #| message: false
@@ -163,11 +163,14 @@ ggplot(penguins, aes(x=bill_length_mm, color=species)) +
 ```
 
 ## 2.10 Pro and Con of Faceting
+> State one strength and one weakness of the faceted plot in the previous task compared to the earlier non-faceted frequency polygons with rug plot.
 
-**Advantage:** - Faceting allows you to compare the distribution of a quantitative variable across different categories. This can be useful for identifying patterns or trends that may not be apparent when the data are combined.<br> 
-**Disadvantage:** - Faceting is not recommended for time series data when doing a comparison of how the trendline moves over time. Combining each line into one coordinate system will make it easier to see the comparison.
+**Advantage:** - Faceting allows you to compare the distribution of a quantitative variable across different categories. This can be useful for identifying patterns or trends that may not be apparent when the data are combined.<br> **Disadvantage:** - Faceting is not recommended for time series data when doing a comparison of how the trendline moves over time. Combining each line into one coordinate system will make it easier to see the comparison.
 
 ## 2.11 Unmarked Bonus Question: Pairwise *t*-Test
+All plots above suggest that the bill length of the Adélie penguin is shorter than that of the gentoo and chinstrap penguins. Let us support this observation quantitatively:
+1. Calculate the mean bill length for each species.
+2. Perform a pairwise *t*-test using R. Report the *p*-value and interpret the result using a significance level of *a* = 0.05.
 
 ```{r}
 #| label: mean_bill_length
@@ -222,7 +225,9 @@ titanic <- read_csv("titanic.csv")
 ```
 
 ## 3.1 Bar Chart of Travelers by Class
+Create a bar chart displaying the number of travelers by class (1st, 2nd, 3rd, and crew). Include a plot title and a caption attributing the source as “Encyclopedia Titanica (2023).” Aim for a solution similar to Figure 3.1.
 
+Hint: You may find it easier to aggregate the number of passenger using `count()` before calling `ggplot()`.
 ```{r}
 #| label: bar_chart
 #| message: false
@@ -244,7 +249,7 @@ ggplot(titanic_new, aes(x=count, y=class)) +
 ```
 
 ## 3.2 Dodged Bar Chart of Travelers by Class and Survival
-
+Use a dodged bar chart to visualize the dependence of the survival rate on the class in which a person traveled. Aim for a solution similar to Figure 3.2.
 ```{r}
 #| labeL: dodged_bar_chart
 #| message: false
@@ -266,7 +271,9 @@ ggplot(titanic_new, aes(x=count, y=class, fill=survived)) +
 ```
 
 ## 3.3 Mosaic Plot
+When working with two categorical variables, such as class and survival, mosaic plots provide an alternative to segmented bar charts. Use the `geom_mosaic()` function from the ggmosaic package to create a mosaic plot of the data in `titanic`. Aim for a solution similar to Figure 3.3.
 
+This task requires some hacking skills. Look at the documentation for `geom_mosaic()`. A hint for printing the number of travelers in each category at the center of the corresponding mosaic tile can be found on Stack Overflow.
 ```{r}
 #| label: mosaic_plot
 #| message: false
@@ -288,5 +295,6 @@ p + geom_text(data = ggplot_build(p)$data[[1]],
 ```
 
 ## 3.4 Pros and Cons of Mosaic Plots
+> State one advantage and one disadvantage of using the mosaic plot in Figure 3.3 instead of the dodged bar chart in Figure 3.2 for the Titanic data.
 
 **Advantage:** - The mosaic plot provides a clearer view of how survival rates vary across passenger classes, making comparisons easier.<br> **Disadvantage:** - It might not give as precise numerical information as a dodged bar chart.

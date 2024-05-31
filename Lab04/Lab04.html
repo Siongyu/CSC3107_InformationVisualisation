@@ -116,6 +116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>2. Visualizing the Distribution of Quantitative Data: Bill Lengths of Pygoscelis Penguins</h1>
 <section id="remove-missing-values" class="level2">
 <h2 class="anchored" data-anchor-id="remove-missing-values">2.1 Remove Missing Values</h2>
+<p>Remove the penguins with missing bill length measurements from the <code>penguins</code> tibble to avoid ggplot2 warning messages in subsequent tasks.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -132,6 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="scatter-plot-of-species-versus-bill-length" class="level2">
 <h2 class="anchored" data-anchor-id="scatter-plot-of-species-versus-bill-length">2.2 Scatter Plot of Species versus Bill Length</h2>
+<p>Create a scatter plot displaying bill length on the x-axis and species on the y-axis. For this task and all subsequent ones, customize the axis labels and add a plot title. Additionally, include a plot caption attributing the source as “Gorman et al.&nbsp;(2014)”.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -154,6 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="why-should-you-jitter-the-plot" class="level2">
 <h2 class="anchored" data-anchor-id="why-should-you-jitter-the-plot">2.3 Why Should You Jitter the Plot?</h2>
+<p>Which feature of the data suggests that jittering the scatter plot might be beneficial? (Hint: Show that individuals cannot be uniquely identified by their bill length and species.)</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -177,6 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="jitter-plot" class="level2">
 <h2 class="anchored" data-anchor-id="jitter-plot">2.4 Jitter Plot</h2>
+<p>Create a jitter plot displaying bill length on the x-axis and species on the y-axis. Reduce the opacity of the points and adjust the <code>width</code> and <code>height</code> arguments so that points are only jittered in the y-direction while ensuring that the points for different species are clearly separated.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -199,6 +203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="bee-swarm-plot" class="level2">
 <h2 class="anchored" data-anchor-id="bee-swarm-plot">2.5 Bee-Swarm Plot</h2>
+<p>Use the <code>geom_beeswarm()</code> function from the ggbeeswarm package to produce a bee-swarm plot illustrating the distribution of bill lengths for each species. Display bill length on the x-axis and species on the y-axis.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -221,10 +226,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pros-and-cons-of-bee-swarm-plots" class="level2">
 <h2 class="anchored" data-anchor-id="pros-and-cons-of-bee-swarm-plots">2.6 Pros and Cons of Bee-Swarm Plots</h2>
-<p><strong>Advantage:</strong> - Bee-Swarm plots are useful for visualizing the distribution of a quantitative variable across different categories. They are especially useful when the number of data points is large.<br> <strong>Disadvantage:</strong> - Bee-Swarm plots can be computationally expensive to create and may not be suitable for very large datasets. With large datasets, meaning there will be a lot of data points, the data points being like a bee will be overlapped and hence the plot will be hard to interpret.</p>
+<blockquote class="blockquote">
+<p>State one advantage and one disadvantage of using a bee-swarm plot rather than a jitter plot for these data?</p>
+</blockquote>
+<p><strong>Advantage: -</strong> Bee-Swarm plots are useful for visualizing the distribution of a quantitative variable across different categories. They are especially useful when the number of data points is large.<br> <strong>Disadvantage: -</strong> Bee-Swarm plots can be computationally expensive to create and may not be suitable for very large datasets. With large datasets, meaning there will be a lot of data points, the data points being like a bee will be overlapped and hence the plot will be hard to interpret.</p>
 </section>
 <section id="violin-plot-with-boxes" class="level2">
 <h2 class="anchored" data-anchor-id="violin-plot-with-boxes">2.7 Violin Plot with Boxes</h2>
+<p>Combine a violin plot and a box plot in one graph. The plot should display bill length on the x-axis and species on the y-axis.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -248,6 +257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="frequency-polygons-with-rug-plot" class="level2">
 <h2 class="anchored" data-anchor-id="frequency-polygons-with-rug-plot">2.8 Frequency Polygons with Rug Plot</h2>
+<p>Display the bill-length distribution of each species as a frequency polygon, using a bin width of your choice. Combine all three frequency polygons into one coordinate system using a color aesthetic. Place a rug plot below the x-axis to show the distribution of individual data points with corresponding colors.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -272,6 +282,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="faceted-frequency-polygons-with-rug-plots" class="level2">
 <h2 class="anchored" data-anchor-id="faceted-frequency-polygons-with-rug-plots">2.9 Faceted Frequency Polygons with Rug Plots</h2>
+<p>Produce a faceted plot that displays the bill-length distribution of each species in a separate facet, using the same bin width as in the previous task. Add a rug plot below each frequency polygon.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -297,10 +308,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pro-and-con-of-faceting" class="level2">
 <h2 class="anchored" data-anchor-id="pro-and-con-of-faceting">2.10 Pro and Con of Faceting</h2>
+<blockquote class="blockquote">
+<p>State one strength and one weakness of the faceted plot in the previous task compared to the earlier non-faceted frequency polygons with rug plot.</p>
+</blockquote>
 <p><strong>Advantage:</strong> - Faceting allows you to compare the distribution of a quantitative variable across different categories. This can be useful for identifying patterns or trends that may not be apparent when the data are combined.<br> <strong>Disadvantage:</strong> - Faceting is not recommended for time series data when doing a comparison of how the trendline moves over time. Combining each line into one coordinate system will make it easier to see the comparison.</p>
 </section>
 <section id="unmarked-bonus-question-pairwise-t-test" class="level2">
 <h2 class="anchored" data-anchor-id="unmarked-bonus-question-pairwise-t-test">2.11 Unmarked Bonus Question: Pairwise <em>t</em>-Test</h2>
+<p>All plots above suggest that the bill length of the Adélie penguin is shorter than that of the gentoo and chinstrap penguins. Let us support this observation quantitatively: 1. Calculate the mean bill length for each species. 2. Perform a pairwise <em>t</em>-test using R. Report the <em>p</em>-value and interpret the result using a significance level of <em>a</em> = 0.05.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -371,6 +386,8 @@ Gentoo      TRUE      TRUE</code></pre>
 </div>
 <section id="bar-chart-of-travelers-by-class" class="level2">
 <h2 class="anchored" data-anchor-id="bar-chart-of-travelers-by-class">3.1 Bar Chart of Travelers by Class</h2>
+<p>Create a bar chart displaying the number of travelers by class (1st, 2nd, 3rd, and crew). Include a plot title and a caption attributing the source as “Encyclopedia Titanica (2023).” Aim for a solution similar to Figure 3.1.</p>
+<p>Hint: You may find it easier to aggregate the number of passenger using <code>count()</code> before calling <code>ggplot()</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -399,6 +416,7 @@ Gentoo      TRUE      TRUE</code></pre>
 </section>
 <section id="dodged-bar-chart-of-travelers-by-class-and-survival" class="level2">
 <h2 class="anchored" data-anchor-id="dodged-bar-chart-of-travelers-by-class-and-survival">3.2 Dodged Bar Chart of Travelers by Class and Survival</h2>
+<p>Use a dodged bar chart to visualize the dependence of the survival rate on the class in which a person traveled. Aim for a solution similar to Figure 3.2.</p>
 <div class="cell" data-label="dodged_bar_chart">
 <details class="code-fold">
 <summary>Code</summary>
@@ -427,6 +445,8 @@ Gentoo      TRUE      TRUE</code></pre>
 </section>
 <section id="mosaic-plot" class="level2">
 <h2 class="anchored" data-anchor-id="mosaic-plot">3.3 Mosaic Plot</h2>
+<p>When working with two categorical variables, such as class and survival, mosaic plots provide an alternative to segmented bar charts. Use the <code>geom_mosaic()</code> function from the ggmosaic package to create a mosaic plot of the data in <code>titanic</code>. Aim for a solution similar to Figure 3.3.</p>
+<p>This task requires some hacking skills. Look at the documentation for <code>geom_mosaic()</code>. A hint for printing the number of travelers in each category at the center of the corresponding mosaic tile can be found on Stack Overflow.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -453,6 +473,9 @@ Gentoo      TRUE      TRUE</code></pre>
 </section>
 <section id="pros-and-cons-of-mosaic-plots" class="level2">
 <h2 class="anchored" data-anchor-id="pros-and-cons-of-mosaic-plots">3.4 Pros and Cons of Mosaic Plots</h2>
+<blockquote class="blockquote">
+<p>State one advantage and one disadvantage of using the mosaic plot in Figure 3.3 instead of the dodged bar chart in Figure 3.2 for the Titanic data.</p>
+</blockquote>
 <p><strong>Advantage:</strong> - The mosaic plot provides a clearer view of how survival rates vary across passenger classes, making comparisons easier.<br> <strong>Disadvantage:</strong> - It might not give as precise numerical information as a dodged bar chart.</p>
 </section>
 </section>
