@@ -80,7 +80,6 @@ difference <- paste0("The number of non-country rows: ", count(countries) - coun
 print(difference)
 ```
 
-
 ## 2.5 Append Continent Column
 
 ```{r}
@@ -118,7 +117,7 @@ num_countries
 ## 2.8 Prepare Country Labels
 
 ```{r}
-#| lbael: prepare_country_labels
+#| label: prepare_country_labels
 
 countries_filtered <- countries_filtered |>
   mutate(label = case_when(
@@ -134,7 +133,9 @@ countries_filtered
 ```
 
 # 3 Visualizing the Data
+
 ## 3.1 Set Up Basic Plot
+
 ```{r}
 #| label: set_up_basic_plot
 
@@ -246,10 +247,12 @@ basic_plot <- basic_plot + theme_classic()
 
 basic_plot
 ```
+
 Tried various theme such as `theme_minimal()`, `theme_light()`, i feel that `theme_classic()` is the best for this plot because the theme removed the coordinates system, which is not necessary for this plot. At the same time, it bolded the axis lines which makes the plot more outstanding. Overall, the looks and feels of the plot is more professional and clean.
 
 ## 3.10 Reason About the Data
-1. The plot shows a positive correlation between GDP per Capita and Life Expectancy. The trend curve is increasing, which means that countries with higher GDP per Capita tend to have higher life expectancy. <br>
-2. The size of the bubble represents the population of the country. The larger the bubble, the larger the population. This visualisation provide a clear understanding of how the bubble are portrayed in the plot. <br>
-3. The color of the bubble represents the continent of the country. The legend on the right shows the color mapping for each continent. <br>
-4. The plot is based on the data from 2019. The data is sourced from the World Bank.
+
+1.  The plot shows a positive correlation between GDP per Capita and Life Expectancy. The trend curve is increasing, which means that countries with higher GDP per Capita tend to have higher life expectancy. <br>
+2.  The size of the bubble represents the population of the country. The larger the bubble, the larger the population. This visualisation provide a clear understanding of how the bubble are portrayed in the plot. <br>
+3.  The color of the bubble represents the continent of the country. The legend on the right shows the color mapping for each continent. <br>
+4.  The plot is based on the data from 2019. The data is sourced from the World Bank.
