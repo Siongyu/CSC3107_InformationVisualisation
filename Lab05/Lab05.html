@@ -101,23 +101,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Load the necessary libraries</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(countrycode)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(countrycode)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="preparing-the-data" class="level1">
 <h1>2 Preparing the Data</h1>
 <section id="data-import" class="level2">
 <h2 class="anchored" data-anchor-id="data-import">2.1 Data Import</h2>
+<p>Import the World Bank data for GDP per capita, life expectancy, and population as three tibbles.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gdp_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/API_NY.GDP.PCAP.KD_DS2_en_csv_v2_144436/API_NY.GDP.PCAP.KD_DS2_en_csv_v2_144436.csv"</span>, <span class="at">skip=</span><span class="dv">3</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>life_exp_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/API_SP.DYN.LE00.IN_DS2_en_csv_v2_144366/API_SP.DYN.LE00.IN_DS2_en_csv_v2_144366.csv"</span>, <span class="at">skip=</span><span class="dv">3</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/API_SP.POP.TOTL_DS2_en_csv_v2_144171/API_SP.POP.TOTL_DS2_en_csv_v2_144171.csv"</span>, <span class="at">skip=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gdp_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/API_NY.GDP.PCAP.KD_DS2_en_excel_v2_143214.xls"</span>, <span class="at">skip=</span><span class="dv">3</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>life_exp_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/API_SP.DYN.LE00.IN_DS2_en_excel_v2_142982.xls"</span>, <span class="at">skip=</span><span class="dv">3</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/API_SP.POP.TOTL_DS2_en_excel_v2_144629.xls"</span>, <span class="at">skip=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="column-selection" class="level2">
 <h2 class="anchored" data-anchor-id="column-selection">2.2 Column Selection</h2>
+<p>For each tibble, retain only three columns:</p>
+<ul>
+<li><p><code>country</code>: Data from the Excel columns titled “Country Name.”</p></li>
+<li><p><code>code</code>: Data from the Excel columns titled “Country Code.”</p></li>
+<li><p>Either <code>gdp_per_cap</code>, <code>life_exp</code> or <code>pop</code>: Data for 2019 only.</p></li>
+</ul>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gdp_data <span class="ot">&lt;-</span> gdp_data <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Country Name"</span>, <span class="st">"Country Code"</span>, <span class="st">"2019"</span>) <span class="sc">|&gt;</span></span>
@@ -134,6 +142,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="merge-data" class="level2">
 <h2 class="anchored" data-anchor-id="merge-data">2.3 Merge Data</h2>
+<p>Use <code>left_join()</code> to merge the three spreadsheets into a single tibble named countries containing five columns: <code>country</code>, <code>code</code>, <code>gdp_per_cap</code>, <code>life_exp</code>, and <code>pop</code>.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>countries <span class="ot">&lt;-</span> gdp_data <span class="sc">|&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(life_exp_data, <span class="at">by=</span><span class="fu">c</span>(<span class="st">'country'</span>, <span class="st">'code'</span>)) <span class="sc">|&gt;</span></span>
@@ -143,6 +152,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="identify-non-country-rows" class="level2">
 <h2 class="anchored" data-anchor-id="identify-non-country-rows">2.4 Identify Non-Country Rows</h2>
+<p>Some rows in the World Bank spreadsheets represent regions rather than individual countries, such as “East Asia &amp; Pacific (excluding high income).” To exclude these rows from the <code>countries</code> tibble, we will use the <code>countrycode()</code> function from the countrycode package. This function allows us to convert country names and country codes from one format to another (e.g., from the English name to standardized ISO 3166-1 numeric codes). A useful feature of <code>countrycode()</code> is that it returns a non-missing value only if the three-letter World Bank code belongs to a single country, for example:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>countries_filtered <span class="ot">&lt;-</span> countries <span class="sc">|&gt;</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">code_2 =</span> <span class="fu">countrycode</span>(code, <span class="at">origin=</span><span class="st">"wb"</span>, <span class="at">destination=</span><span class="st">"wb"</span>, <span class="at">warn=</span><span class="cn">FALSE</span>)) <span class="sc">|&gt;</span></span>
@@ -159,6 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="append-continent-column" class="level2">
 <h2 class="anchored" data-anchor-id="append-continent-column">2.5 Append Continent Column</h2>
+<p>Use <code>countrycode()</code> to append a column containing the continent of each country.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>countries_filtered <span class="ot">&lt;-</span> countries_filtered <span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">continent =</span> <span class="fu">countrycode</span>(code, <span class="at">origin=</span><span class="st">"wb"</span>, <span class="at">destination=</span><span class="st">"continent"</span>, <span class="at">warn=</span><span class="cn">FALSE</span>))</span>
@@ -179,6 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="remove-missing-data" class="level2">
 <h2 class="anchored" data-anchor-id="remove-missing-data">2.6 Remove Missing Data</h2>
+<p>Remove all rows from the <code>countries</code> tibble that contain any missing values to prevent ggplot2 from triggering a warning in subsequent tasks.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>countries_filtered <span class="ot">&lt;-</span> countries_filtered <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
@@ -191,6 +203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="count-countries" class="level2">
 <h2 class="anchored" data-anchor-id="count-countries">2.7 Count Countries</h2>
+<p>How many countries are remaining in the <code>countries</code> tibble?</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>num_countries <span class="ot">&lt;-</span> </span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(countries_filtered, country) <span class="sc">|&gt;</span></span>
@@ -207,14 +220,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="prepare-country-labels" class="level2">
 <h2 class="anchored" data-anchor-id="prepare-country-labels">2.8 Prepare Country Labels</h2>
-<div class="cell" data-layout-align="center" data-lbael="prepare_country_labels">
+<p>A subsequent task requires you to add country names as labels to the plot. To prepare for this task, add a <code>label</code> column to the data containing the three-letter codes of the following countries:</p>
+<ul>
+<li><p>The 10 countries with the highest GDP.</p></li>
+<li><p>The 10 countries with the lowest GDP.</p></li>
+<li><p>The 10 countries with the longest life expectancy.</p></li>
+<li><p>The 10 countries with the shortest life expectancy.</p></li>
+<li><p>The 10 most populous countries.</p></li>
+</ul>
+<p>Please note that some countries may be included in multiple categories. For all other countries, the label should be an empty string.</p>
+<div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>countries_filtered <span class="ot">&lt;-</span> countries_filtered <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">case_when</span>(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rank</span>(<span class="fu">desc</span>(gdp_per_cap)) <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> code,</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rank</span>(gdp_per_cap) <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> code,</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rank</span>(<span class="fu">desc</span>(life_exp)) <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> code,</span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rank</span>(life_exp) <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> code,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rank</span>(pop) <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> code,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rank</span>(<span class="fu">desc</span>(pop)) <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> code,</span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">""</span></span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  ))</span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
@@ -236,12 +258,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 # ℹ 188 more rows</code></pre>
 </div>
 </div>
+<hr>
 </section>
 </section>
 <section id="visualizing-the-data" class="level1">
 <h1>3 Visualizing the Data</h1>
 <section id="set-up-basic-plot" class="level2">
 <h2 class="anchored" data-anchor-id="set-up-basic-plot">3.1 Set Up Basic Plot</h2>
+<p>As an initial step towards creating a plot similar to Figure 1.2, create a basic plot by using <code>ggplot()</code> and a <code>geom_*()</code> function to display one bubble per country. Choose suitable aesthetics for the plot and make the bubbles semi-transparent, which is an improvement compared to Gapminder’s approach.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(countries_filtered, <span class="fu">aes</span>(<span class="at">x =</span> gdp_per_cap, <span class="at">y =</span> life_exp, <span class="at">size =</span> pop, <span class="at">color =</span> continent)) <span class="sc">+</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>)</span>
@@ -258,6 +282,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="add-labels" class="level2">
 <h2 class="anchored" data-anchor-id="add-labels">3.2 Add Labels</h2>
+<p>Use <code>geom_text_repel()</code> to add the labels from the <code>label</code> column of the <code>countries</code> tibble. Set the <code>show.legend</code> argument equal to <code>FALSE</code> to exclude the text layer from the legends.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> label), <span class="at">show.legend =</span> <span class="cn">FALSE</span>, <span class="at">max.overlaps =</span> <span class="cn">Inf</span>)</span>
@@ -274,6 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="add-trend-curve" class="level2">
 <h2 class="anchored" data-anchor-id="add-trend-curve">3.3 Add Trend Curve</h2>
+<p>Use <code>geom_smooth()</code> to fit a single LOESS curve to all data points in the plot. Set the countries’ population as the weighting variable for the curve. Choose a neutral color for the curve to indicate that it is not specific to any continent.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color=</span><span class="st">"gray"</span>, <span class="at">size=</span><span class="dv">1</span>, <span class="fu">aes</span>(<span class="at">weight=</span>pop))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -293,6 +319,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="add-annotations" class="level2">
 <h2 class="anchored" data-anchor-id="add-annotations">3.4 Add Annotations</h2>
+<p>Provide meaningful axis labels, legend labels and a title for the plot. Additionally, include a caption that credits the World Bank as the data source.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
@@ -316,6 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="change-x-axis-scale" class="level2">
 <h2 class="anchored" data-anchor-id="change-x-axis-scale">3.5 Change x-Axis Scale</h2>
+<p>Change the x-coordinates to a logarithmic scale in the plot. Adjust the breaks and minor breaks of the logarithmic scale as shown in figure Figure 1.3 using the <code>breaks_log()</code> functions from the scales package. Customize the tick mark labels to be more reader-friendly, such as displaying “1,000” instead of the default “1e+03” format.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span> </span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(</span>
@@ -335,11 +363,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="change-size-scale" class="level2">
 <h2 class="anchored" data-anchor-id="change-size-scale">3.6 Change Size Scale</h2>
+<p>Use <code>scale_size_area()</code> to adjust the legend so that the areas of the bubbles represent populations of 1 million, 10 million, 100 million and 1 billion. Modify the labels in the legend from “1e+06”, “1e+07”, “1e+08”, and “1e+09” to more reader-friendly strings like “1M”, “10M”, “100M”, and “1B”. Increase the <code>max_size</code> argument to ensure that the bubble areas are approximately the same as in the Gapminder figure.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_area</span>(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"1M"</span>, <span class="st">"10M"</span>, <span class="st">"100M"</span>, <span class="st">"1B"</span>),</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_size =</span> <span class="dv">20</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_size =</span> <span class="dv">10</span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>basic_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -354,6 +383,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="change-color-scale" class="level2">
 <h2 class="anchored" data-anchor-id="change-color-scale">3.7 Change Color Scale</h2>
+<p>Change the color scale to the ColorBrewer palette “Set1,” which provides clearer contrasts than ggplot2’s default colors. Note that these colors are not the same as those in the Gapminder figure.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>)</span>
@@ -370,6 +400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="override-transparency-in-legend" class="level2">
 <h2 class="anchored" data-anchor-id="override-transparency-in-legend">3.8 Override Transparency in Legend</h2>
+<p>Semi-transparent colors are effective for addressing overplotting in the bubble plot. However, they are not ideal for the legend, where we want clear color contrasts. Override the alpha aesthetic in the legend to remove transparency. Additionally, increase the sizes of the circles in the color legend to enhance readability. You can refer to section 11.3.6 in Wickham, Navarro and Pedersen (2021) for related examples.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
@@ -389,6 +420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="choose-a-ggplot2-theme" class="level2">
 <h2 class="anchored" data-anchor-id="choose-a-ggplot2-theme">3.9 Choose a ggplot2 Theme</h2>
+<p>Choose a ggplot2 theme and provide arguments to support your choice. There is no definitive right or wrong answer in this case, but you should clearly express your reasoning.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>basic_plot <span class="ot">&lt;-</span> basic_plot <span class="sc">+</span> <span class="fu">theme_classic</span>()</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -401,15 +433,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Tried various theme such as <code>theme_minimal()</code>, <code>theme_light()</code>, i feel that <code>theme_classic()</code> is the best for this plot because the theme removed the coordinates system, which is not necessary for this plot. At the same time, it bolded the axis lines which makes the plot more outstanding. Overall, the looks and feels of the plot is more professional and clean.</p>
+<p>I have tried various theme such as <code>theme_minimal()</code>, <code>theme_light()</code>, i feel that <code>theme_classic()</code> is the best for this plot because the theme removed the coordinates system, which is not necessary for this plot. At the same time, it bolded the axis lines which makes the plot more outstanding. Overall, the looks and feels of the plot is more professional and clean.</p>
 </section>
 <section id="reason-about-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="reason-about-the-data">3.10 Reason About the Data</h2>
+<p>Write at least four sentences about the data. What does the plot reveal about the data? If you refer to specific countries, make sure to add the corresponding labels in the plot if necessary.</p>
 <ol type="1">
-<li>The plot shows a positive correlation between GDP per Capita and Life Expectancy. The trend curve is increasing, which means that countries with higher GDP per Capita tend to have higher life expectancy. <br></li>
-<li>The size of the bubble represents the population of the country. The larger the bubble, the larger the population. This visualisation provide a clear understanding of how the bubble are portrayed in the plot. <br></li>
-<li>The color of the bubble represents the continent of the country. The legend on the right shows the color mapping for each continent. <br></li>
-<li>The plot is based on the data from 2019. The data is sourced from the World Bank.</li>
+<li><p>The plot shows a positive correlation between GDP per Capita and Life Expectancy. The trend curve is increasing, which means that countries with higher GDP per Capita tend to have higher life expectancy.</p></li>
+<li><p>The size of the bubble represents the population of the country. The larger the bubble, the larger the population. This visualisation provide a clear understanding of how the bubble are portrayed in the plot.</p></li>
+<li><p>The color of the bubble represents the continent of the country. The legend on the right shows the color mapping for each continent.</p></li>
+<li><p>The plot is based on the data from 2019. The data is sourced from the World Bank.</p></li>
 </ol>
 </section>
 </section>
