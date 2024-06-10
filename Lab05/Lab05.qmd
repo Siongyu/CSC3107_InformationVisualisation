@@ -43,11 +43,11 @@ pop_data <- read_excel("data/API_SP.POP.TOTL_DS2_en_excel_v2_144629.xls", skip=3
 
 For each tibble, retain only three columns:
 
-- `country`: Data from the Excel columns titled “Country Name.”
+-   `country`: Data from the Excel columns titled “Country Name.”
 
-- `code`: Data from the Excel columns titled “Country Code.”
+-   `code`: Data from the Excel columns titled “Country Code.”
 
-- Either `gdp_per_cap`, `life_exp` or `pop`: Data for 2019 only.
+-   Either `gdp_per_cap`, `life_exp` or `pop`: Data for 2019 only.
 
 ```{r}
 #| label: column_selection
@@ -139,35 +139,33 @@ num_countries
 
 A subsequent task requires you to add country names as labels to the plot. To prepare for this task, add a `label` column to the data containing the three-letter codes of the following countries:
 
-- The 10 countries with the highest GDP.
+-   The 10 countries with the highest GDP.
 
-- The 10 countries with the lowest GDP.
+-   The 10 countries with the lowest GDP.
 
-- The 10 countries with the longest life expectancy.
+-   The 10 countries with the longest life expectancy.
 
-- The 10 countries with the shortest life expectancy.
+-   The 10 countries with the shortest life expectancy.
 
-- The 10 most populous countries.
+-   The 10 most populous countries.
 
 Please note that some countries may be included in multiple categories. For all other countries, the label should be an empty string.
 
 ```{r}
 #| label: prepare_country_labels
 
-countries_filtered <- countries_filtered |>
-  mutate(label = case_when(
-    rank(desc(gdp_per_cap)) <= 10 ~ code,
-    rank(gdp_per_cap) <= 10 ~ code,
-    rank(desc(life_exp)) <= 10 ~ code,
-    rank(life_exp) <= 10 ~ code,
-    rank(desc(pop)) <= 10 ~ code,
-    TRUE ~ ""
-  ))
+countries_filtered <- mutate(countries_filtered, 
+                             label=if_else(
+                               min_rank(gdp_per_cap) < 10 | min_rank(-gdp_per_cap) < 10 |
+                                 min_rank(life_exp) < 10 | min_rank(-life_exp) < 10 | 
+                                 min_rank(-pop) < 10,
+                               code, ""
+                             ))
 
-countries_filtered
+slice_head(countries_filtered, n=12)
 ```
 
----
+------------------------------------------------------------------------
 
 # 3 Visualizing the Data
 
@@ -178,8 +176,8 @@ As an initial step towards creating a plot similar to Figure 1.2, create a basic
 ```{r}
 #| label: set_up_basic_plot
 
-basic_plot <- ggplot(countries_filtered, aes(x = gdp_per_cap, y = life_exp, size = pop, color = continent)) +
-  geom_point(alpha = 0.6)
+basic_plot <- ggplot(countries_filtered, aes(x = gdp_per_cap, y = life_exp, color = continent)) +
+  geom_point(aes(size=pop), alpha = 0.6)
 
 basic_plot
 ```
@@ -192,7 +190,12 @@ Use `geom_text_repel()` to add the labels from the `label` column of the `countr
 #| label: add_labels
 
 basic_plot <- basic_plot +
-  geom_text_repel(aes(label = label), show.legend = FALSE, max.overlaps = Inf)
+  geom_text_repel(
+    aes(label = label, size=1e6*pop^2), 
+    show.legend = FALSE, 
+    max.overlaps = 20,
+    min.segment.length = 0.25
+  )
 
 basic_plot
 ```
@@ -205,7 +208,12 @@ Use `geom_smooth()` to fit a single LOESS curve to all data points in the plot. 
 #| label: add_trend_curve
 
 basic_plot <- basic_plot +
-  geom_smooth(method = "loess", se = FALSE, color="gray", size=1, aes(weight=pop))
+  geom_smooth(
+    method = "loess", 
+    color="gray50", 
+    aes(weight=pop), 
+    formula=y ~ x
+  )
 
 basic_plot
 ```
@@ -219,7 +227,7 @@ Provide meaningful axis labels, legend labels and a title for the plot. Addition
 
 basic_plot <- basic_plot +
   labs(
-    title = "GDP per Capita vs. Life Expectancy",
+    title = "Longevity and Wealth by Country in 2019",
     x = "GDP per Capita (US$, PPP 2019)",
     y = "Life Expectancy (years)",
     legend = "Continent",
@@ -239,8 +247,9 @@ Change the x-coordinates to a logarithmic scale in the plot. Adjust the breaks a
 
 basic_plot <- basic_plot + 
   scale_x_log10(
-    breaks = breaks_log(n = 10),
-    labels = dollar_format(scale = 1)
+    breaks = breaks_log(n = 6),
+    labels = label_comma(),
+    minor_breaks=NULL
   )
 
 basic_plot
@@ -255,8 +264,9 @@ Use `scale_size_area()` to adjust the legend so that the areas of the bubbles re
 
 basic_plot <- basic_plot +
   scale_size_area(
-    labels = c("1M", "10M", "100M", "1B"),
-    max_size = 10
+    labels = label_number(scale_cut = cut_short_scale()),
+    max_size = 15,
+    breaks = 10^(6:9)
   )
 
 basic_plot
@@ -284,8 +294,7 @@ Semi-transparent colors are effective for addressing overplotting in the bubble 
 
 basic_plot <- basic_plot +
   guides(
-    color = guide_legend(override.aes = list(alpha = 1, size = 5)),
-    size = guide_legend(override.aes = list(size = 5))
+    color = guide_legend(override.aes = list(alpha = 1, size = 5))
   )
 
 basic_plot
@@ -309,10 +318,10 @@ I have tried various theme such as `theme_minimal()`, `theme_light()`, i feel th
 
 Write at least four sentences about the data. What does the plot reveal about the data? If you refer to specific countries, make sure to add the corresponding labels in the plot if necessary.
 
-1.  The plot shows a positive correlation between GDP per Capita and Life Expectancy. The trend curve is increasing, which means that countries with higher GDP per Capita tend to have higher life expectancy. 
+1.  The plot shows a positive correlation between GDP per Capita and Life Expectancy. The trend curve is increasing, which means that countries with higher GDP per Capita tend to have higher life expectancy.
 
-2.  The size of the bubble represents the population of the country. The larger the bubble, the larger the population. This visualisation provide a clear understanding of how the bubble are portrayed in the plot. 
+2.  The size of the bubble represents the population of the country. The larger the bubble, the larger the population. This visualisation provide a clear understanding of how the bubble are portrayed in the plot.
 
-3.  The color of the bubble represents the continent of the country. The legend on the right shows the color mapping for each continent. 
+3.  The color of the bubble represents the continent of the country. The legend on the right shows the color mapping for each continent.
 
 4.  The plot is based on the data from 2019. The data is sourced from the World Bank.
