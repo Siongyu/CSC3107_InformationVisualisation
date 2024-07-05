@@ -1,0 +1,121 @@
+---
+title: "CSC3107-Information Visualisation Quiz, student id ends with 5"
+format: html
+editor: visual
+author: "Loo Siong Yu (2201255)"
+---
+
+# Introduction
+
+```{r}
+#| label: required-packages
+#| message: False
+
+library(tidyverse)
+library(countrycode)
+library(gt)
+library(readxl)
+library(scales)
+library(sf)
+library(tmap)
+```
+
+
+# Import Data
+
+```{r}
+#| label: import-data
+#| message: False
+
+country_stats <- read_xls("API_SN.ITK.DEFC.ZS_DS2_en_excel_v2_65590.xls",skip=3)
+head(country_stats)
+```
+
+
+
+# Select Data for a Particular Year 2017
+
+```{r}
+#| label: select-data
+#| message: False
+
+# extract the data for the year 2017 from country_stats
+country_stats <-
+  select(country_stats, country = `Country Name`, code = `Country Code`, unourish_pct = `2017`)
+
+head(country_stats)
+```
+
+
+
+# Create `sf` Object by Merging with the `World` Data Set
+
+```{r}
+#| label: merge-data
+#| message: False
+
+data(World)
+map_data_sf <-
+  World |>
+  left_join(country_stats, by = c("iso_a3" = "code")) |>
+  select(country, code=iso_a3, unourish_pct, area, geometry)
+
+head(map_data_sf)
+```
+
+
+
+# Create Choropleth Map
+
+```{r}
+earth <- st_polygon(
+  x = list(
+    cbind(
+      c(rep(-180, 181), rep(180, 181), -180), c(-90:90, 90:-90, -90)
+    )
+  )
+) |>
+  st_sfc() |>
+  st_set_crs(4326) |> # Rectangular projection
+  st_as_sf()
+```
+
+
+```{r}
+#| label: choropleth-map
+#| message: False
+
+map_data_sf <-
+  map_data_sf |>
+  mutate(
+    area_rank = min_rank(-area),
+    code_label = ifelse(area_rank <= 20, code, "")
+  )
+
+ggplot(map_data_sf, aes(fill=unourish_pct)) +
+  geom_sf(data=earth, fill="aliceblue") +
+  geom_sf() +
+  geom_sf_text(aes(label=code_label), size=2) +
+  geom_sf_text(data=subset(map_data_sf, code_label %in% c("GRL", "COD", "ATA")), aes(label=code_label), size=2, color="white") +
+  labs(
+    fill=NULL,
+    title="Prevalence of Undernourishment (% of Population)",
+    caption="Source: World Bank"
+  ) +
+  scale_fill_fermenter(
+    breaks = breaks_log(n=4),
+    labels = percent_format(scale=1),
+    palette="YlOrRd",
+    direction=1
+  ) +
+  coord_sf(crs="ESRI:54035") +
+  theme_void() +
+  theme(
+    legend.position="top",
+    legend.key.width=unit(1.25, "cm"),
+    legend.key=element_rect(color="black"),
+    legend.margin=margin(5,0,0,0),
+    plot.title=element_text(hjust=0.5, face="bold"),
+  )
+```
+

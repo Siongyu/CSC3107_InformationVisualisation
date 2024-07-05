@@ -1,0 +1,180 @@
+---
+title: "lecture_2"
+format: html
+editor: visual
+---
+
+# Required Packages
+
+```{r}
+#| message: false
+#| label: setup
+library(tidyverse)
+library(gt)
+```
+
+# Pivoting
+
+New York City mayoral election example:
+
+```{r}
+#| message: false
+#| label: import-ny-mayor
+
+ny_mayor <- read_csv("ny_mayor_wide.csv")
+ny_mayor
+```
+
+This data frame has `r nrow(ny_mayor)` rows and `r ncol(ny_mayor)` columns which is relatively wide. We can pivot this data frame to make it longer.
+
+```{r}
+#| label: pivot-longer
+
+ny_mayor_long <-
+  pivot_longer(ny_mayor,
+    cols = c("de_blasio", "malliotakis", "other"),
+    names_to = "candidate",
+    values_to = "votes"
+  )
+
+ny_mayor_long
+```
+
+We can also pivot data frames into wider format:
+
+```{r}
+#| label: pivot-wider
+
+ny_mayor_wider <- pivot_wider(
+  ny_mayor_long,
+  names_from = candidate,
+  values_from = votes
+)
+
+ny_mayor_wider
+```
+
+# Pivoting the ASEAN data
+
+```{r}
+#| label: import-asean
+
+trade <- read_csv("asean_trade_by_country_and_mode_of_transport.csv")
+trade
+```
+
+`trade` is currently in a wide format with `r nrow(trade)` rows and `r ncol(trade)` columns. For easier readability, we want to make the data wider.
+
+```{r}
+#| label: pivot-wider-asean
+
+trade_wide <- pivot_wider(
+  trade,
+  names_from = mode,
+  values_from = million_usd
+)
+trade_wide
+```
+
+# Create Basic gt Table
+
+```{r}
+gt_trade <- 
+  trade_wide |>
+  gt(rowname_col = "country", groupname_col = "year") |>
+  tab_options(
+    table.font.size = px(10),
+    quarto.disable_processing = TRUE
+  )
+
+gt_trade
+```
+
+# Add Annotations
+
+```{r}
+gt_trade <-
+  gt_trade |>
+  tab_header(
+    title = "ASEAN Trade by Country and Mode of Transport",
+    subtitle = "Values in million USD"
+  ) |>
+  tab_spanner(
+    label = "Mode",
+    columns = Air:Unknown
+  ) |>
+  tab_stubhead(
+    label = "Country"
+  ) |>
+  tab_footnote(
+    footnote = "Data available in total",
+    locations = cells_stub(c("Singapore", "Viet Nam"))
+  ) |>
+  tab_source_note(source_note = "ASEAN Secretariat (2024)")
+
+gt_trade
+```
+
+# Format data
+
+```{r}
+#| label: format-data
+
+gt_trade <-
+  gt_trade |>
+  fmt_number(decimals = 1) |>
+  sub_missing()
+
+gt_trade
+```
+
+# Modify columns
+
+```{r}
+#| label: modify-columns
+
+gt_trade <- cols_width(
+  gt_trade,
+  "Not elsewhere classified" ~ px(90),
+)
+
+gt_trade
+```
+
+# Add summary rows
+
+```{r}
+#| label: add-summary-rows
+
+gt_trade <-
+  gt_trade |>
+  summary_rows(
+    fns = "Annual total" ~ sum(., na.rm = TRUE),
+    fmt = ~ fmt_number(., decimals = 1)
+  )
+
+gt_trade
+```
+
+# Styling
+
+```{r}
+#| label: styling
+# color url: http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf
+
+gt_trade <-
+  gt_trade |>
+  tab_style(
+    style = list(
+      cell_fill(color = "gray90"),
+      cell_text(weight = "bold", style = "italic")
+    ),
+    locations = cells_title()
+  ) |>
+  tab_style(
+    style = cell_fill(color = "aliceblue"),
+    locations = list(cells_stubhead(), cells_stub())
+  )
+
+gt_trade
+```

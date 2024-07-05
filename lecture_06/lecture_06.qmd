@@ -1,0 +1,245 @@
+---
+title: "lecture_06"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(tmap)
+library(sf)
+library(mapview)
+library(rmapshaper)
+library(readxl)
+library(scales)
+```
+
+# Coords
+
+## Limits of Coordinate Axes
+
+```{r}
+#| layout-ncol: 2
+#| fig-width: 2.5
+
+michelle <-
+  filter(storms, name=="Michelle") |>
+  select(long, lat) |>
+  mutate(observation=row_number())
+
+gg_michelle <-
+  ggplot(michelle, aes(x=long, y=lat, color=observation)) +
+  geom_point() +
+  geom_path()
+
+gg_michelle
+gg_michelle + 
+  xlim(-85, -80) +
+  ylim(15, 20)
+
+# Equivalent to the previous command
+# gg_michelle + 
+#  scale_x_continuous(limits=c(-85, -80)) +
+#  scale_y_continuous(limits=c(15, 20))
+```
+
+## Pie Charts in ggplot2
+
+There is no geom pie in ggplot2. There may be some 3rd party packages that provide this functionality, but it is not built into ggplot2. Hence, we will use the `coord_polar` function to create pie charts.
+
+```{r}
+ggplot(gss_cat, aes(y=0, fill=partyid)) +
+  geom_bar() +
+  coord_polar()
+```
+
+# Simple Features
+
+```{r}
+data(World)
+ggplot(World, aes(fill=continent)) + geom_sf()
+```
+
+Retrieve geometry type of an sf object with `st_geometry_type()`.
+
+```{r}
+head(st_geometry_type(World))
+all(st_is(World, "MULTIPOLYGON"))
+```
+
+Example of a "POINT" geomtry:
+
+```{r}
+data(metro)
+ggplot(metro) + geom_sf(data=World) + geom_sf(alpha=0.5)
+head(st_geomtry_type(metro))
+```
+
+Example of a :LINESTRING" geometry:
+
+```{r}
+data(rivers)
+ggplot(rivers) + geom_sf(data=World) + geom_sf(color="blue")
+head(st_geometry_type(rivers))
+```
+
+What is Polygon? Polygon may contain holes:
+
+```{r}
+zaf <- filter(World, name=="South Africa")
+ggplot(zaf) + geom_sf(fill="lightgreen")
+```
+
+Note that not every country of a single polygon. For example, Malaysia has two major parts (Penisular Malaysia and East Malaysia):
+
+```{r}
+mys <- filter(World, name == "Malaysia")
+ggplot(mys) + geom_sf(fill="lightgreen")
+```
+
+# Importing Geospatial Data
+
+```{r}
+sgp <- read_sf("Singapore_by_planning_area_since_1999.geojson")
+ggplot(sgp) + geom_sf()
+npts(sgp) # prints the number of points in the sf object
+```
+
+```{r}
+wb <- read_sf("WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp")
+# ggplot(wb) + geom_sf()
+npts(wb)
+wb_simplify <- ms_simplify(wb)
+ggplot(wb_simplify) + geom_sf()
+npts(wb_simplify)
+```
+
+# Map Projections
+
+Every sf object has an associated map projection (also known as "coordinate reference system"), which can be extracted using the `st_crs()` function.
+
+```{r}
+st_crs(World)$Name
+```
+
+"WGS 84" is a plain longitude-latitude projection (i.e. longitude in degrees are mapped to the x-axis and latitude in degrees are mapped to the y-axis). This projection is also known as equirectangular or Plate Carree.
+
+Map projections are cataloged by SRID (Spatial Reference System Identifier), which can be retrieved also using the `st_crs()` function:
+
+```{r}
+st_crs(World)$srid
+```
+
+For most thematic maps, it is advisable to use an equal-area projection. Examples are:
+
+*   Behrmann (SRID: ESRI: 54017)
+
+*   Equal Earth Projection (SRID: ESRI: 54035)
+
+*   Molleweide (SRID: ESRI: 54009)
+
+```{r}
+earth <- st_polygon(
+  x = list(
+    cbind(
+      c(rep(-180, 181), rep(180, 181), -180), c(-90:90, 90:-90, -90)
+    )
+  )
+) |>
+  st_sfc() |>
+  st_set_crs(4326) |> # Equirectangular projection
+  st_as_sf()
+
+gg_equirect <- 
+  ggplot(World) + 
+  geom_sf(data = earth, fill="aliceblue") +
+  geom_sf() + 
+  geom_sf(data = filter(World, name %in% c("Greenland", "Australia")), fill="darkgreen") +
+  labs(title = "Equirectangular") +
+  theme_void()
+gg_behrmann <- 
+  ggplot(World) + 
+  geom_sf(data = earth, fill="aliceblue") +
+  geom_sf() + 
+  geom_sf(data = filter(World, name %in% c("Greenland", "Australia")), fill="darkgreen") +
+  coord_sf(crs="ESRI:54017") + 
+  labs(title="Behrmann") + 
+  theme_void()
+gg_equal_earth <-
+  ggplot(World) +
+  geom_sf(data = earth, fill="aliceblue") +
+  geom_sf() +
+  geom_sf(data = filter(World, name %in% c("Greenland", "Australia")), fill="darkgreen") +
+  coord_sf(crs="ESRI:54035") +
+  labs(title="Equal Earth") +
+  theme_minimal()
+gg_molleweide <-
+  ggplot(World) +
+  geom_sf(data = earth, fill="aliceblue") +
+  geom_sf() +
+  geom_sf(data = filter(World, name %in% c("Greenland", "Australia")), fill="darkgreen") +
+  coord_sf(crs="ESRI:54009") +
+  labs(title="Molleweide") +
+  theme_classic()
+
+gg_equirect
+gg_behrmann
+gg_equal_earth
+gg_molleweide
+```
+
+Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+
+# Choropleth Maps
+
+```{r}
+atm <- 
+  "API_FB.ATM.TOTL.P5_DS2_en_excel_v2_50414.xls" |>
+  read_xls(skip=3) |>
+  select(
+    country=`Country Name`,
+    code=`Country Code`,
+    atm_2020=`2020`,
+    atm_2021=`2021`
+  )
+atm
+```
+
+Join these data by country code to the `World` sf object:
+
+```{r}
+world <- 
+  World |>
+  left_join(atm, by = c("iso_a3" = "code")) |>
+  select(code=iso_a3, country, atm_2020, atm_2021, area) |>
+  mutate(
+    area_rank = min_rank(-area),
+    country_label = ifelse(area_rank <= 20, code, "")
+  )
+ggplot(world, aes(fill=atm_2021)) + 
+  geom_sf(data=earth, fill="aliceblue") +
+  geom_sf() +
+  geom_sf_text(aes(label=country_label),size=2, color="red") +
+  labs(
+    fill = NULL,
+    title="ATMs per 100,000 adults in 2021",
+    caption="Source: World Bank"
+  ) +
+  scale_fill_fermenter(
+    breaks = breaks_log(n=6), # breaks_pretty if it is a linear scale, breaks_log if it is a log scale
+    palette="Greens", 
+    direction=1
+  ) +
+  coord_sf(crs = "ESRI:54035") +
+  theme_void() +
+  theme(
+    legend.position="top", # move the legend to the top
+    legend.key.width=unit(1.25, "cm"), # increase the width of the legend key
+    legend.margin = margin(5, 0, 0, 0), # increase the margin between the legend and the plot
+    plot.title=element_text(hjust=0.5) # move the plot title to the center
+  )
+```
+

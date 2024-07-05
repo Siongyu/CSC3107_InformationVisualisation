@@ -1,0 +1,4542 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>lecture_2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lecture_2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_2_files/libs/quarto-html/quarto.js"></script>
+<script src="lecture_2_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lecture_2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lecture_2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_2_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lecture_2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lecture_2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lecture_2_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">lecture_2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="required-packages" class="level1">
+<h1>Required Packages</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pivoting" class="level1">
+<h1>Pivoting</h1>
+<p>New York City mayoral election example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ny_mayor <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"ny_mayor_wide.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ny_mayor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  borough       de_blasio malliotakis other
+  &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;
+1 Bronx            117712       23715  3138
+2 Brooklyn         254755       74343 10602
+3 Manhattan        190312       53853 10186
+4 Queens           171867       94911  8974
+5 Staten Island     25466       70125  2747</code></pre>
+</div>
+</div>
+<p>This data frame has 5 rows and 4 columns which is relatively wide. We can pivot this data frame to make it longer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ny_mayor_long <span class="ot">&lt;-</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(ny_mayor,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"de_blasio"</span>, <span class="st">"malliotakis"</span>, <span class="st">"other"</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"candidate"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"votes"</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ny_mayor_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 15 × 3
+   borough       candidate    votes
+   &lt;chr&gt;         &lt;chr&gt;        &lt;dbl&gt;
+ 1 Bronx         de_blasio   117712
+ 2 Bronx         malliotakis  23715
+ 3 Bronx         other         3138
+ 4 Brooklyn      de_blasio   254755
+ 5 Brooklyn      malliotakis  74343
+ 6 Brooklyn      other        10602
+ 7 Manhattan     de_blasio   190312
+ 8 Manhattan     malliotakis  53853
+ 9 Manhattan     other        10186
+10 Queens        de_blasio   171867
+11 Queens        malliotakis  94911
+12 Queens        other         8974
+13 Staten Island de_blasio    25466
+14 Staten Island malliotakis  70125
+15 Staten Island other         2747</code></pre>
+</div>
+</div>
+<p>We can also pivot data frames into wider format:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ny_mayor_wider <span class="ot">&lt;-</span> <span class="fu">pivot_wider</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  ny_mayor_long,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">names_from =</span> candidate,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">values_from =</span> votes</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ny_mayor_wider</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  borough       de_blasio malliotakis other
+  &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;
+1 Bronx            117712       23715  3138
+2 Brooklyn         254755       74343 10602
+3 Manhattan        190312       53853 10186
+4 Queens           171867       94911  8974
+5 Staten Island     25466       70125  2747</code></pre>
+</div>
+</div>
+</section>
+<section id="pivoting-the-asean-data" class="level1">
+<h1>Pivoting the ASEAN data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>trade <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"asean_trade_by_country_and_mode_of_transport.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 120 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): country, mode
+dbl (2): year, million_usd
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 120 × 4
+    year country           mode                     million_usd
+   &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt;                          &lt;dbl&gt;
+ 1  2021 Brunei Darussalam Air                         761.    
+ 2  2021 Brunei Darussalam Water                     17690.    
+ 3  2021 Brunei Darussalam Land                        234.    
+ 4  2021 Brunei Darussalam Not elsewhere classified      0.300 
+ 5  2021 Brunei Darussalam Unknown                       0.0606
+ 6  2021 Brunei Darussalam Total                     18686.    
+ 7  2021 Cambodia          Air                        5494.    
+ 8  2021 Cambodia          Water                     25954.    
+ 9  2021 Cambodia          Land                      10992.    
+10  2021 Cambodia          Not elsewhere classified      0     
+# ℹ 110 more rows</code></pre>
+</div>
+</div>
+<p><code>trade</code> is currently in a wide format with 120 rows and 4 columns. For easier readability, we want to make the data wider.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trade_wide <span class="ot">&lt;-</span> <span class="fu">pivot_wider</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  trade,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">names_from =</span> mode,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">values_from =</span> million_usd</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>trade_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 8
+    year country      Air   Water    Land Not elsewhere classi…¹  Unknown  Total
+   &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;                  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+ 1  2021 Brunei …    761.  1.77e4   234.                   0.300  6.06e-2 1.87e4
+ 2  2021 Cambodia   5494.  2.60e4 10992.                   0      1.05e+0 4.24e4
+ 3  2021 Indones…  32865.  3.92e5    28.5               2934.     0       4.28e5
+ 4  2021 Lao PDR    1035.  2.95e0 10298.                2249.     0       1.36e4
+ 5  2021 Malaysia 166440.  2.99e5 71657.                 764.     0       5.38e5
+ 6  2021 Myanmar       0   2.08e4  7630.                   0      0       2.85e4
+ 7  2021 Philipp…  75156.  1.33e5     0                   41.5    0       2.09e5
+ 8  2021 Singapo… 459627.  3.27e5 73117.                3350.     0       8.63e5
+ 9  2021 Thailand 117003.  3.64e5 59268.                 186.     0       5.40e5
+10  2021 Viet Nam     NA  NA         NA                   NA     NA       6.67e5
+11  2022 Brunei …    842.  2.22e4   277.                   0.204  1.74e-2 2.33e4
+12  2022 Cambodia   6675.  3.09e4 13167.                   4.22   8.51e-1 5.07e4
+13  2022 Indones…  31496.  4.95e5    66.5               3124.     0       5.29e5
+14  2022 Lao PDR     995.  1.30e1 13771.                2401.     0       1.72e4
+15  2022 Malaysia 203623.  3.68e5 82860.                 287.     0       6.55e5
+16  2022 Myanmar    1178.  2.53e4  8040.                   0      0       3.45e4
+17  2022 Philipp…  79193.  1.45e5     0                    0      0       2.24e5
+18  2022 Singapo… 499261.  4.04e5 82483.                4061.     0       9.90e5
+19  2022 Thailand 129243.  4.03e5 57540.                2525.     0       5.92e5
+20  2022 Viet Nam 218473.  4.53e5 42024.                8155.     7.70e+3 7.30e5
+# ℹ abbreviated name: ¹​`Not elsewhere classified`</code></pre>
+</div>
+</div>
+</section>
+<section id="create-basic-gt-table" class="level1">
+<h1>Create Basic gt Table</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>gt_trade <span class="ot">&lt;-</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  trade_wide <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">"country"</span>, <span class="at">groupname_col =</span> <span class="st">"year"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.font.size =</span> <span class="fu">px</span>(<span class="dv">10</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">quarto.disable_processing =</span> <span class="cn">TRUE</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>gt_trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="aartnczboi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#aartnczboi table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#aartnczboi thead, #aartnczboi tbody, #aartnczboi tfoot, #aartnczboi tr, #aartnczboi td, #aartnczboi th {
+  border-style: none;
+}
+
+#aartnczboi p {
+  margin: 0;
+  padding: 0;
+}
+
+#aartnczboi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#aartnczboi .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#aartnczboi .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#aartnczboi .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#aartnczboi .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#aartnczboi .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aartnczboi .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#aartnczboi .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#aartnczboi .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#aartnczboi .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#aartnczboi .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#aartnczboi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#aartnczboi .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#aartnczboi .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#aartnczboi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#aartnczboi .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#aartnczboi .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#aartnczboi .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#aartnczboi .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aartnczboi .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#aartnczboi .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#aartnczboi .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#aartnczboi .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aartnczboi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#aartnczboi .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#aartnczboi .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aartnczboi .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aartnczboi .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#aartnczboi .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aartnczboi .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#aartnczboi .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aartnczboi .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#aartnczboi .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aartnczboi .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#aartnczboi .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aartnczboi .gt_left {
+  text-align: left;
+}
+
+#aartnczboi .gt_center {
+  text-align: center;
+}
+
+#aartnczboi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#aartnczboi .gt_font_normal {
+  font-weight: normal;
+}
+
+#aartnczboi .gt_font_bold {
+  font-weight: bold;
+}
+
+#aartnczboi .gt_font_italic {
+  font-style: italic;
+}
+
+#aartnczboi .gt_super {
+  font-size: 65%;
+}
+
+#aartnczboi .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#aartnczboi .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#aartnczboi .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#aartnczboi .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#aartnczboi .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#aartnczboi .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#aartnczboi .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id=""></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Air">Air</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Water">Water</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Land">Land</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Not elsewhere classified">Not elsewhere classified</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unknown">Unknown</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Total">Total</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2021 stub_1_1 Air" class="gt_row gt_right">761.0567</td>
+<td headers="2021 stub_1_1 Water" class="gt_row gt_right">1.769030e+04</td>
+<td headers="2021 stub_1_1 Land" class="gt_row gt_right">234.32719</td>
+<td headers="2021 stub_1_1 Not elsewhere classified" class="gt_row gt_right">0.3004478</td>
+<td headers="2021 stub_1_1 Unknown" class="gt_row gt_right">6.060465e-02</td>
+<td headers="2021 stub_1_1 Total" class="gt_row gt_right">18686.05</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2021 stub_1_2 Air" class="gt_row gt_right">5493.8877</td>
+<td headers="2021 stub_1_2 Water" class="gt_row gt_right">2.595352e+04</td>
+<td headers="2021 stub_1_2 Land" class="gt_row gt_right">10991.71079</td>
+<td headers="2021 stub_1_2 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2021 stub_1_2 Unknown" class="gt_row gt_right">1.050398e+00</td>
+<td headers="2021 stub_1_2 Total" class="gt_row gt_right">42440.17</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2021 stub_1_3 Air" class="gt_row gt_right">32865.3624</td>
+<td headers="2021 stub_1_3 Water" class="gt_row gt_right">3.919712e+05</td>
+<td headers="2021 stub_1_3 Land" class="gt_row gt_right">28.46377</td>
+<td headers="2021 stub_1_3 Not elsewhere classified" class="gt_row gt_right">2934.4523180</td>
+<td headers="2021 stub_1_3 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_3 Total" class="gt_row gt_right">427799.46</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2021 stub_1_4 Air" class="gt_row gt_right">1035.2067</td>
+<td headers="2021 stub_1_4 Water" class="gt_row gt_right">2.946049e+00</td>
+<td headers="2021 stub_1_4 Land" class="gt_row gt_right">10297.75810</td>
+<td headers="2021 stub_1_4 Not elsewhere classified" class="gt_row gt_right">2248.9103202</td>
+<td headers="2021 stub_1_4 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_4 Total" class="gt_row gt_right">13584.82</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2021 stub_1_5 Air" class="gt_row gt_right">166439.9452</td>
+<td headers="2021 stub_1_5 Water" class="gt_row gt_right">2.986408e+05</td>
+<td headers="2021 stub_1_5 Land" class="gt_row gt_right">71656.82361</td>
+<td headers="2021 stub_1_5 Not elsewhere classified" class="gt_row gt_right">764.0754516</td>
+<td headers="2021 stub_1_5 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_5 Total" class="gt_row gt_right">537501.62</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2021 stub_1_6 Air" class="gt_row gt_right">0.0000</td>
+<td headers="2021 stub_1_6 Water" class="gt_row gt_right">2.083427e+04</td>
+<td headers="2021 stub_1_6 Land" class="gt_row gt_right">7629.64821</td>
+<td headers="2021 stub_1_6 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2021 stub_1_6 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_6 Total" class="gt_row gt_right">28463.91</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2021 stub_1_7 Air" class="gt_row gt_right">75155.6129</td>
+<td headers="2021 stub_1_7 Water" class="gt_row gt_right">1.334284e+05</td>
+<td headers="2021 stub_1_7 Land" class="gt_row gt_right">0.00000</td>
+<td headers="2021 stub_1_7 Not elsewhere classified" class="gt_row gt_right">41.5100000</td>
+<td headers="2021 stub_1_7 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_7 Total" class="gt_row gt_right">208625.51</td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">Singapore</th>
+<td headers="2021 stub_1_8 Air" class="gt_row gt_right">459626.6460</td>
+<td headers="2021 stub_1_8 Water" class="gt_row gt_right">3.267533e+05</td>
+<td headers="2021 stub_1_8 Land" class="gt_row gt_right">73116.66730</td>
+<td headers="2021 stub_1_8 Not elsewhere classified" class="gt_row gt_right">3349.5665044</td>
+<td headers="2021 stub_1_8 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_8 Total" class="gt_row gt_right">862846.21</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2021 stub_1_9 Air" class="gt_row gt_right">117002.8346</td>
+<td headers="2021 stub_1_9 Water" class="gt_row gt_right">3.638618e+05</td>
+<td headers="2021 stub_1_9 Land" class="gt_row gt_right">59267.81503</td>
+<td headers="2021 stub_1_9 Not elsewhere classified" class="gt_row gt_right">185.7011389</td>
+<td headers="2021 stub_1_9 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_9 Total" class="gt_row gt_right">540318.17</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">Viet Nam</th>
+<td headers="2021 stub_1_10 Air" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Water" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Land" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Not elsewhere classified" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Unknown" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Total" class="gt_row gt_right">666544.88</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2022">2022</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2022 stub_1_11 Air" class="gt_row gt_right">842.1254</td>
+<td headers="2022 stub_1_11 Water" class="gt_row gt_right">2.222070e+04</td>
+<td headers="2022 stub_1_11 Land" class="gt_row gt_right">277.37726</td>
+<td headers="2022 stub_1_11 Not elsewhere classified" class="gt_row gt_right">0.2038457</td>
+<td headers="2022 stub_1_11 Unknown" class="gt_row gt_right">1.742094e-02</td>
+<td headers="2022 stub_1_11 Total" class="gt_row gt_right">23340.43</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2022 stub_1_12 Air" class="gt_row gt_right">6675.0490</td>
+<td headers="2022 stub_1_12 Water" class="gt_row gt_right">3.090129e+04</td>
+<td headers="2022 stub_1_12 Land" class="gt_row gt_right">13166.82381</td>
+<td headers="2022 stub_1_12 Not elsewhere classified" class="gt_row gt_right">4.2153817</td>
+<td headers="2022 stub_1_12 Unknown" class="gt_row gt_right">8.509760e-01</td>
+<td headers="2022 stub_1_12 Total" class="gt_row gt_right">50748.23</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2022 stub_1_13 Air" class="gt_row gt_right">31495.8320</td>
+<td headers="2022 stub_1_13 Water" class="gt_row gt_right">4.946653e+05</td>
+<td headers="2022 stub_1_13 Land" class="gt_row gt_right">66.45736</td>
+<td headers="2022 stub_1_13 Not elsewhere classified" class="gt_row gt_right">3123.7463829</td>
+<td headers="2022 stub_1_13 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_13 Total" class="gt_row gt_right">529351.36</td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2022 stub_1_14 Air" class="gt_row gt_right">994.8062</td>
+<td headers="2022 stub_1_14 Water" class="gt_row gt_right">1.295661e+01</td>
+<td headers="2022 stub_1_14 Land" class="gt_row gt_right">13770.70691</td>
+<td headers="2022 stub_1_14 Not elsewhere classified" class="gt_row gt_right">2401.2965558</td>
+<td headers="2022 stub_1_14 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_14 Total" class="gt_row gt_right">17179.77</td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2022 stub_1_15 Air" class="gt_row gt_right">203623.4199</td>
+<td headers="2022 stub_1_15 Water" class="gt_row gt_right">3.680919e+05</td>
+<td headers="2022 stub_1_15 Land" class="gt_row gt_right">82859.99887</td>
+<td headers="2022 stub_1_15 Not elsewhere classified" class="gt_row gt_right">287.0250901</td>
+<td headers="2022 stub_1_15 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_15 Total" class="gt_row gt_right">654862.30</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2022 stub_1_16 Air" class="gt_row gt_right">1177.9570</td>
+<td headers="2022 stub_1_16 Water" class="gt_row gt_right">2.526865e+04</td>
+<td headers="2022 stub_1_16 Land" class="gt_row gt_right">8040.23772</td>
+<td headers="2022 stub_1_16 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2022 stub_1_16 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_16 Total" class="gt_row gt_right">34486.84</td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2022 stub_1_17 Air" class="gt_row gt_right">79192.6523</td>
+<td headers="2022 stub_1_17 Water" class="gt_row gt_right">1.449173e+05</td>
+<td headers="2022 stub_1_17 Land" class="gt_row gt_right">0.00000</td>
+<td headers="2022 stub_1_17 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2022 stub_1_17 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_17 Total" class="gt_row gt_right">224109.90</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub">Singapore</th>
+<td headers="2022 stub_1_18 Air" class="gt_row gt_right">499260.5116</td>
+<td headers="2022 stub_1_18 Water" class="gt_row gt_right">4.043132e+05</td>
+<td headers="2022 stub_1_18 Land" class="gt_row gt_right">82483.04107</td>
+<td headers="2022 stub_1_18 Not elsewhere classified" class="gt_row gt_right">4060.7019955</td>
+<td headers="2022 stub_1_18 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_18 Total" class="gt_row gt_right">990117.41</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2022 stub_1_19 Air" class="gt_row gt_right">129242.9673</td>
+<td headers="2022 stub_1_19 Water" class="gt_row gt_right">4.029798e+05</td>
+<td headers="2022 stub_1_19 Land" class="gt_row gt_right">57540.25045</td>
+<td headers="2022 stub_1_19 Not elsewhere classified" class="gt_row gt_right">2525.1199344</td>
+<td headers="2022 stub_1_19 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_19 Total" class="gt_row gt_right">592288.14</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub">Viet Nam</th>
+<td headers="2022 stub_1_20 Air" class="gt_row gt_right">218472.6057</td>
+<td headers="2022 stub_1_20 Water" class="gt_row gt_right">4.533461e+05</td>
+<td headers="2022 stub_1_20 Land" class="gt_row gt_right">42023.96101</td>
+<td headers="2022 stub_1_20 Not elsewhere classified" class="gt_row gt_right">8154.7954163</td>
+<td headers="2022 stub_1_20 Unknown" class="gt_row gt_right">7.700507e+03</td>
+<td headers="2022 stub_1_20 Total" class="gt_row gt_right">729697.97</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="add-annotations" class="level1">
+<h1>Add Annotations</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gt_trade <span class="ot">&lt;-</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  gt_trade <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"ASEAN Trade by Country and Mode of Transport"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Values in million USD"</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Mode"</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Air<span class="sc">:</span>Unknown</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_stubhead</span>(</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Country"</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Data available in total"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_stub</span>(<span class="fu">c</span>(<span class="st">"Singapore"</span>, <span class="st">"Viet Nam"</span>))</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="st">"ASEAN Secretariat (2024)"</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>gt_trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="tzymbhdazy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tzymbhdazy table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#tzymbhdazy thead, #tzymbhdazy tbody, #tzymbhdazy tfoot, #tzymbhdazy tr, #tzymbhdazy td, #tzymbhdazy th {
+  border-style: none;
+}
+
+#tzymbhdazy p {
+  margin: 0;
+  padding: 0;
+}
+
+#tzymbhdazy .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#tzymbhdazy .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#tzymbhdazy .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#tzymbhdazy .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#tzymbhdazy .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#tzymbhdazy .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#tzymbhdazy .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#tzymbhdazy .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#tzymbhdazy .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#tzymbhdazy .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#tzymbhdazy .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tzymbhdazy .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#tzymbhdazy .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#tzymbhdazy .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#tzymbhdazy .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tzymbhdazy .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#tzymbhdazy .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#tzymbhdazy .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#tzymbhdazy .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tzymbhdazy .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#tzymbhdazy .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tzymbhdazy .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#tzymbhdazy .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tzymbhdazy .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tzymbhdazy .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tzymbhdazy .gt_left {
+  text-align: left;
+}
+
+#tzymbhdazy .gt_center {
+  text-align: center;
+}
+
+#tzymbhdazy .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#tzymbhdazy .gt_font_normal {
+  font-weight: normal;
+}
+
+#tzymbhdazy .gt_font_bold {
+  font-weight: bold;
+}
+
+#tzymbhdazy .gt_font_italic {
+  font-style: italic;
+}
+
+#tzymbhdazy .gt_super {
+  font-size: 65%;
+}
+
+#tzymbhdazy .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#tzymbhdazy .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#tzymbhdazy .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#tzymbhdazy .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#tzymbhdazy .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#tzymbhdazy .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#tzymbhdazy .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_title gt_font_normal" style="">ASEAN Trade by Country and Mode of Transport</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="">Values in million USD</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="Country">Country</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Mode">
+        <span class="gt_column_spanner">Mode</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" scope="col" id="Total">Total</th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Air">Air</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Water">Water</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Land">Land</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Not elsewhere classified">Not elsewhere classified</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unknown">Unknown</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2021 stub_1_1 Air" class="gt_row gt_right">761.0567</td>
+<td headers="2021 stub_1_1 Water" class="gt_row gt_right">1.769030e+04</td>
+<td headers="2021 stub_1_1 Land" class="gt_row gt_right">234.32719</td>
+<td headers="2021 stub_1_1 Not elsewhere classified" class="gt_row gt_right">0.3004478</td>
+<td headers="2021 stub_1_1 Unknown" class="gt_row gt_right">6.060465e-02</td>
+<td headers="2021 stub_1_1 Total" class="gt_row gt_right">18686.05</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2021 stub_1_2 Air" class="gt_row gt_right">5493.8877</td>
+<td headers="2021 stub_1_2 Water" class="gt_row gt_right">2.595352e+04</td>
+<td headers="2021 stub_1_2 Land" class="gt_row gt_right">10991.71079</td>
+<td headers="2021 stub_1_2 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2021 stub_1_2 Unknown" class="gt_row gt_right">1.050398e+00</td>
+<td headers="2021 stub_1_2 Total" class="gt_row gt_right">42440.17</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2021 stub_1_3 Air" class="gt_row gt_right">32865.3624</td>
+<td headers="2021 stub_1_3 Water" class="gt_row gt_right">3.919712e+05</td>
+<td headers="2021 stub_1_3 Land" class="gt_row gt_right">28.46377</td>
+<td headers="2021 stub_1_3 Not elsewhere classified" class="gt_row gt_right">2934.4523180</td>
+<td headers="2021 stub_1_3 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_3 Total" class="gt_row gt_right">427799.46</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2021 stub_1_4 Air" class="gt_row gt_right">1035.2067</td>
+<td headers="2021 stub_1_4 Water" class="gt_row gt_right">2.946049e+00</td>
+<td headers="2021 stub_1_4 Land" class="gt_row gt_right">10297.75810</td>
+<td headers="2021 stub_1_4 Not elsewhere classified" class="gt_row gt_right">2248.9103202</td>
+<td headers="2021 stub_1_4 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_4 Total" class="gt_row gt_right">13584.82</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2021 stub_1_5 Air" class="gt_row gt_right">166439.9452</td>
+<td headers="2021 stub_1_5 Water" class="gt_row gt_right">2.986408e+05</td>
+<td headers="2021 stub_1_5 Land" class="gt_row gt_right">71656.82361</td>
+<td headers="2021 stub_1_5 Not elsewhere classified" class="gt_row gt_right">764.0754516</td>
+<td headers="2021 stub_1_5 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_5 Total" class="gt_row gt_right">537501.62</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2021 stub_1_6 Air" class="gt_row gt_right">0.0000</td>
+<td headers="2021 stub_1_6 Water" class="gt_row gt_right">2.083427e+04</td>
+<td headers="2021 stub_1_6 Land" class="gt_row gt_right">7629.64821</td>
+<td headers="2021 stub_1_6 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2021 stub_1_6 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_6 Total" class="gt_row gt_right">28463.91</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2021 stub_1_7 Air" class="gt_row gt_right">75155.6129</td>
+<td headers="2021 stub_1_7 Water" class="gt_row gt_right">1.334284e+05</td>
+<td headers="2021 stub_1_7 Land" class="gt_row gt_right">0.00000</td>
+<td headers="2021 stub_1_7 Not elsewhere classified" class="gt_row gt_right">41.5100000</td>
+<td headers="2021 stub_1_7 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_7 Total" class="gt_row gt_right">208625.51</td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">Singapore<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_8 Air" class="gt_row gt_right">459626.6460</td>
+<td headers="2021 stub_1_8 Water" class="gt_row gt_right">3.267533e+05</td>
+<td headers="2021 stub_1_8 Land" class="gt_row gt_right">73116.66730</td>
+<td headers="2021 stub_1_8 Not elsewhere classified" class="gt_row gt_right">3349.5665044</td>
+<td headers="2021 stub_1_8 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_8 Total" class="gt_row gt_right">862846.21</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2021 stub_1_9 Air" class="gt_row gt_right">117002.8346</td>
+<td headers="2021 stub_1_9 Water" class="gt_row gt_right">3.638618e+05</td>
+<td headers="2021 stub_1_9 Land" class="gt_row gt_right">59267.81503</td>
+<td headers="2021 stub_1_9 Not elsewhere classified" class="gt_row gt_right">185.7011389</td>
+<td headers="2021 stub_1_9 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2021 stub_1_9 Total" class="gt_row gt_right">540318.17</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">Viet Nam<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_10 Air" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Water" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Land" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Not elsewhere classified" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Unknown" class="gt_row gt_right">NA</td>
+<td headers="2021 stub_1_10 Total" class="gt_row gt_right">666544.88</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2022">2022</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2022 stub_1_11 Air" class="gt_row gt_right">842.1254</td>
+<td headers="2022 stub_1_11 Water" class="gt_row gt_right">2.222070e+04</td>
+<td headers="2022 stub_1_11 Land" class="gt_row gt_right">277.37726</td>
+<td headers="2022 stub_1_11 Not elsewhere classified" class="gt_row gt_right">0.2038457</td>
+<td headers="2022 stub_1_11 Unknown" class="gt_row gt_right">1.742094e-02</td>
+<td headers="2022 stub_1_11 Total" class="gt_row gt_right">23340.43</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2022 stub_1_12 Air" class="gt_row gt_right">6675.0490</td>
+<td headers="2022 stub_1_12 Water" class="gt_row gt_right">3.090129e+04</td>
+<td headers="2022 stub_1_12 Land" class="gt_row gt_right">13166.82381</td>
+<td headers="2022 stub_1_12 Not elsewhere classified" class="gt_row gt_right">4.2153817</td>
+<td headers="2022 stub_1_12 Unknown" class="gt_row gt_right">8.509760e-01</td>
+<td headers="2022 stub_1_12 Total" class="gt_row gt_right">50748.23</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2022 stub_1_13 Air" class="gt_row gt_right">31495.8320</td>
+<td headers="2022 stub_1_13 Water" class="gt_row gt_right">4.946653e+05</td>
+<td headers="2022 stub_1_13 Land" class="gt_row gt_right">66.45736</td>
+<td headers="2022 stub_1_13 Not elsewhere classified" class="gt_row gt_right">3123.7463829</td>
+<td headers="2022 stub_1_13 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_13 Total" class="gt_row gt_right">529351.36</td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2022 stub_1_14 Air" class="gt_row gt_right">994.8062</td>
+<td headers="2022 stub_1_14 Water" class="gt_row gt_right">1.295661e+01</td>
+<td headers="2022 stub_1_14 Land" class="gt_row gt_right">13770.70691</td>
+<td headers="2022 stub_1_14 Not elsewhere classified" class="gt_row gt_right">2401.2965558</td>
+<td headers="2022 stub_1_14 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_14 Total" class="gt_row gt_right">17179.77</td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2022 stub_1_15 Air" class="gt_row gt_right">203623.4199</td>
+<td headers="2022 stub_1_15 Water" class="gt_row gt_right">3.680919e+05</td>
+<td headers="2022 stub_1_15 Land" class="gt_row gt_right">82859.99887</td>
+<td headers="2022 stub_1_15 Not elsewhere classified" class="gt_row gt_right">287.0250901</td>
+<td headers="2022 stub_1_15 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_15 Total" class="gt_row gt_right">654862.30</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2022 stub_1_16 Air" class="gt_row gt_right">1177.9570</td>
+<td headers="2022 stub_1_16 Water" class="gt_row gt_right">2.526865e+04</td>
+<td headers="2022 stub_1_16 Land" class="gt_row gt_right">8040.23772</td>
+<td headers="2022 stub_1_16 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2022 stub_1_16 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_16 Total" class="gt_row gt_right">34486.84</td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2022 stub_1_17 Air" class="gt_row gt_right">79192.6523</td>
+<td headers="2022 stub_1_17 Water" class="gt_row gt_right">1.449173e+05</td>
+<td headers="2022 stub_1_17 Land" class="gt_row gt_right">0.00000</td>
+<td headers="2022 stub_1_17 Not elsewhere classified" class="gt_row gt_right">0.0000000</td>
+<td headers="2022 stub_1_17 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_17 Total" class="gt_row gt_right">224109.90</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub">Singapore</th>
+<td headers="2022 stub_1_18 Air" class="gt_row gt_right">499260.5116</td>
+<td headers="2022 stub_1_18 Water" class="gt_row gt_right">4.043132e+05</td>
+<td headers="2022 stub_1_18 Land" class="gt_row gt_right">82483.04107</td>
+<td headers="2022 stub_1_18 Not elsewhere classified" class="gt_row gt_right">4060.7019955</td>
+<td headers="2022 stub_1_18 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_18 Total" class="gt_row gt_right">990117.41</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2022 stub_1_19 Air" class="gt_row gt_right">129242.9673</td>
+<td headers="2022 stub_1_19 Water" class="gt_row gt_right">4.029798e+05</td>
+<td headers="2022 stub_1_19 Land" class="gt_row gt_right">57540.25045</td>
+<td headers="2022 stub_1_19 Not elsewhere classified" class="gt_row gt_right">2525.1199344</td>
+<td headers="2022 stub_1_19 Unknown" class="gt_row gt_right">0.000000e+00</td>
+<td headers="2022 stub_1_19 Total" class="gt_row gt_right">592288.14</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub">Viet Nam</th>
+<td headers="2022 stub_1_20 Air" class="gt_row gt_right">218472.6057</td>
+<td headers="2022 stub_1_20 Water" class="gt_row gt_right">4.533461e+05</td>
+<td headers="2022 stub_1_20 Land" class="gt_row gt_right">42023.96101</td>
+<td headers="2022 stub_1_20 Not elsewhere classified" class="gt_row gt_right">8154.7954163</td>
+<td headers="2022 stub_1_20 Unknown" class="gt_row gt_right">7.700507e+03</td>
+<td headers="2022 stub_1_20 Total" class="gt_row gt_right">729697.97</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="7">ASEAN Secretariat (2024)</td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="7"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Data available in total</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="format-data" class="level1">
+<h1>Format data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>gt_trade <span class="ot">&lt;-</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  gt_trade <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>gt_trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="jlxwsmfugm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jlxwsmfugm table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#jlxwsmfugm thead, #jlxwsmfugm tbody, #jlxwsmfugm tfoot, #jlxwsmfugm tr, #jlxwsmfugm td, #jlxwsmfugm th {
+  border-style: none;
+}
+
+#jlxwsmfugm p {
+  margin: 0;
+  padding: 0;
+}
+
+#jlxwsmfugm .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#jlxwsmfugm .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#jlxwsmfugm .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#jlxwsmfugm .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#jlxwsmfugm .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#jlxwsmfugm .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#jlxwsmfugm .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#jlxwsmfugm .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#jlxwsmfugm .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#jlxwsmfugm .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#jlxwsmfugm .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#jlxwsmfugm .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#jlxwsmfugm .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#jlxwsmfugm .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#jlxwsmfugm .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jlxwsmfugm .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#jlxwsmfugm .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#jlxwsmfugm .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#jlxwsmfugm .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jlxwsmfugm .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#jlxwsmfugm .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jlxwsmfugm .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#jlxwsmfugm .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jlxwsmfugm .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jlxwsmfugm .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jlxwsmfugm .gt_left {
+  text-align: left;
+}
+
+#jlxwsmfugm .gt_center {
+  text-align: center;
+}
+
+#jlxwsmfugm .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#jlxwsmfugm .gt_font_normal {
+  font-weight: normal;
+}
+
+#jlxwsmfugm .gt_font_bold {
+  font-weight: bold;
+}
+
+#jlxwsmfugm .gt_font_italic {
+  font-style: italic;
+}
+
+#jlxwsmfugm .gt_super {
+  font-size: 65%;
+}
+
+#jlxwsmfugm .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#jlxwsmfugm .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#jlxwsmfugm .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#jlxwsmfugm .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#jlxwsmfugm .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#jlxwsmfugm .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#jlxwsmfugm .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_title gt_font_normal" style="">ASEAN Trade by Country and Mode of Transport</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="">Values in million USD</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="Country">Country</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Mode">
+        <span class="gt_column_spanner">Mode</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" scope="col" id="Total">Total</th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Air">Air</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Water">Water</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Land">Land</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Not elsewhere classified">Not elsewhere classified</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unknown">Unknown</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2021 stub_1_1 Air" class="gt_row gt_right">761.1</td>
+<td headers="2021 stub_1_1 Water" class="gt_row gt_right">17,690.3</td>
+<td headers="2021 stub_1_1 Land" class="gt_row gt_right">234.3</td>
+<td headers="2021 stub_1_1 Not elsewhere classified" class="gt_row gt_right">0.3</td>
+<td headers="2021 stub_1_1 Unknown" class="gt_row gt_right">0.1</td>
+<td headers="2021 stub_1_1 Total" class="gt_row gt_right">18,686.0</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2021 stub_1_2 Air" class="gt_row gt_right">5,493.9</td>
+<td headers="2021 stub_1_2 Water" class="gt_row gt_right">25,953.5</td>
+<td headers="2021 stub_1_2 Land" class="gt_row gt_right">10,991.7</td>
+<td headers="2021 stub_1_2 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_2 Unknown" class="gt_row gt_right">1.1</td>
+<td headers="2021 stub_1_2 Total" class="gt_row gt_right">42,440.2</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2021 stub_1_3 Air" class="gt_row gt_right">32,865.4</td>
+<td headers="2021 stub_1_3 Water" class="gt_row gt_right">391,971.2</td>
+<td headers="2021 stub_1_3 Land" class="gt_row gt_right">28.5</td>
+<td headers="2021 stub_1_3 Not elsewhere classified" class="gt_row gt_right">2,934.5</td>
+<td headers="2021 stub_1_3 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_3 Total" class="gt_row gt_right">427,799.5</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2021 stub_1_4 Air" class="gt_row gt_right">1,035.2</td>
+<td headers="2021 stub_1_4 Water" class="gt_row gt_right">2.9</td>
+<td headers="2021 stub_1_4 Land" class="gt_row gt_right">10,297.8</td>
+<td headers="2021 stub_1_4 Not elsewhere classified" class="gt_row gt_right">2,248.9</td>
+<td headers="2021 stub_1_4 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_4 Total" class="gt_row gt_right">13,584.8</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2021 stub_1_5 Air" class="gt_row gt_right">166,439.9</td>
+<td headers="2021 stub_1_5 Water" class="gt_row gt_right">298,640.8</td>
+<td headers="2021 stub_1_5 Land" class="gt_row gt_right">71,656.8</td>
+<td headers="2021 stub_1_5 Not elsewhere classified" class="gt_row gt_right">764.1</td>
+<td headers="2021 stub_1_5 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_5 Total" class="gt_row gt_right">537,501.6</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2021 stub_1_6 Air" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Water" class="gt_row gt_right">20,834.3</td>
+<td headers="2021 stub_1_6 Land" class="gt_row gt_right">7,629.6</td>
+<td headers="2021 stub_1_6 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Total" class="gt_row gt_right">28,463.9</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2021 stub_1_7 Air" class="gt_row gt_right">75,155.6</td>
+<td headers="2021 stub_1_7 Water" class="gt_row gt_right">133,428.4</td>
+<td headers="2021 stub_1_7 Land" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Not elsewhere classified" class="gt_row gt_right">41.5</td>
+<td headers="2021 stub_1_7 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Total" class="gt_row gt_right">208,625.5</td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">Singapore<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_8 Air" class="gt_row gt_right">459,626.6</td>
+<td headers="2021 stub_1_8 Water" class="gt_row gt_right">326,753.3</td>
+<td headers="2021 stub_1_8 Land" class="gt_row gt_right">73,116.7</td>
+<td headers="2021 stub_1_8 Not elsewhere classified" class="gt_row gt_right">3,349.6</td>
+<td headers="2021 stub_1_8 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_8 Total" class="gt_row gt_right">862,846.2</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2021 stub_1_9 Air" class="gt_row gt_right">117,002.8</td>
+<td headers="2021 stub_1_9 Water" class="gt_row gt_right">363,861.8</td>
+<td headers="2021 stub_1_9 Land" class="gt_row gt_right">59,267.8</td>
+<td headers="2021 stub_1_9 Not elsewhere classified" class="gt_row gt_right">185.7</td>
+<td headers="2021 stub_1_9 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_9 Total" class="gt_row gt_right">540,318.2</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">Viet Nam<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_10 Air" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Water" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Land" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Not elsewhere classified" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Unknown" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Total" class="gt_row gt_right">666,544.9</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2022">2022</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2022 stub_1_11 Air" class="gt_row gt_right">842.1</td>
+<td headers="2022 stub_1_11 Water" class="gt_row gt_right">22,220.7</td>
+<td headers="2022 stub_1_11 Land" class="gt_row gt_right">277.4</td>
+<td headers="2022 stub_1_11 Not elsewhere classified" class="gt_row gt_right">0.2</td>
+<td headers="2022 stub_1_11 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_11 Total" class="gt_row gt_right">23,340.4</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2022 stub_1_12 Air" class="gt_row gt_right">6,675.0</td>
+<td headers="2022 stub_1_12 Water" class="gt_row gt_right">30,901.3</td>
+<td headers="2022 stub_1_12 Land" class="gt_row gt_right">13,166.8</td>
+<td headers="2022 stub_1_12 Not elsewhere classified" class="gt_row gt_right">4.2</td>
+<td headers="2022 stub_1_12 Unknown" class="gt_row gt_right">0.9</td>
+<td headers="2022 stub_1_12 Total" class="gt_row gt_right">50,748.2</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2022 stub_1_13 Air" class="gt_row gt_right">31,495.8</td>
+<td headers="2022 stub_1_13 Water" class="gt_row gt_right">494,665.3</td>
+<td headers="2022 stub_1_13 Land" class="gt_row gt_right">66.5</td>
+<td headers="2022 stub_1_13 Not elsewhere classified" class="gt_row gt_right">3,123.7</td>
+<td headers="2022 stub_1_13 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_13 Total" class="gt_row gt_right">529,351.4</td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2022 stub_1_14 Air" class="gt_row gt_right">994.8</td>
+<td headers="2022 stub_1_14 Water" class="gt_row gt_right">13.0</td>
+<td headers="2022 stub_1_14 Land" class="gt_row gt_right">13,770.7</td>
+<td headers="2022 stub_1_14 Not elsewhere classified" class="gt_row gt_right">2,401.3</td>
+<td headers="2022 stub_1_14 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_14 Total" class="gt_row gt_right">17,179.8</td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2022 stub_1_15 Air" class="gt_row gt_right">203,623.4</td>
+<td headers="2022 stub_1_15 Water" class="gt_row gt_right">368,091.9</td>
+<td headers="2022 stub_1_15 Land" class="gt_row gt_right">82,860.0</td>
+<td headers="2022 stub_1_15 Not elsewhere classified" class="gt_row gt_right">287.0</td>
+<td headers="2022 stub_1_15 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_15 Total" class="gt_row gt_right">654,862.3</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2022 stub_1_16 Air" class="gt_row gt_right">1,178.0</td>
+<td headers="2022 stub_1_16 Water" class="gt_row gt_right">25,268.6</td>
+<td headers="2022 stub_1_16 Land" class="gt_row gt_right">8,040.2</td>
+<td headers="2022 stub_1_16 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Total" class="gt_row gt_right">34,486.8</td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2022 stub_1_17 Air" class="gt_row gt_right">79,192.7</td>
+<td headers="2022 stub_1_17 Water" class="gt_row gt_right">144,917.3</td>
+<td headers="2022 stub_1_17 Land" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Total" class="gt_row gt_right">224,109.9</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub">Singapore</th>
+<td headers="2022 stub_1_18 Air" class="gt_row gt_right">499,260.5</td>
+<td headers="2022 stub_1_18 Water" class="gt_row gt_right">404,313.2</td>
+<td headers="2022 stub_1_18 Land" class="gt_row gt_right">82,483.0</td>
+<td headers="2022 stub_1_18 Not elsewhere classified" class="gt_row gt_right">4,060.7</td>
+<td headers="2022 stub_1_18 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_18 Total" class="gt_row gt_right">990,117.4</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2022 stub_1_19 Air" class="gt_row gt_right">129,243.0</td>
+<td headers="2022 stub_1_19 Water" class="gt_row gt_right">402,979.8</td>
+<td headers="2022 stub_1_19 Land" class="gt_row gt_right">57,540.3</td>
+<td headers="2022 stub_1_19 Not elsewhere classified" class="gt_row gt_right">2,525.1</td>
+<td headers="2022 stub_1_19 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_19 Total" class="gt_row gt_right">592,288.1</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub">Viet Nam</th>
+<td headers="2022 stub_1_20 Air" class="gt_row gt_right">218,472.6</td>
+<td headers="2022 stub_1_20 Water" class="gt_row gt_right">453,346.1</td>
+<td headers="2022 stub_1_20 Land" class="gt_row gt_right">42,024.0</td>
+<td headers="2022 stub_1_20 Not elsewhere classified" class="gt_row gt_right">8,154.8</td>
+<td headers="2022 stub_1_20 Unknown" class="gt_row gt_right">7,700.5</td>
+<td headers="2022 stub_1_20 Total" class="gt_row gt_right">729,698.0</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="7">ASEAN Secretariat (2024)</td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="7"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Data available in total</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="modify-columns" class="level1">
+<h1>Modify columns</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>gt_trade <span class="ot">&lt;-</span> <span class="fu">cols_width</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  gt_trade,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Not elsewhere classified"</span> <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>gt_trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="puwmesbzfa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#puwmesbzfa table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#puwmesbzfa thead, #puwmesbzfa tbody, #puwmesbzfa tfoot, #puwmesbzfa tr, #puwmesbzfa td, #puwmesbzfa th {
+  border-style: none;
+}
+
+#puwmesbzfa p {
+  margin: 0;
+  padding: 0;
+}
+
+#puwmesbzfa .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#puwmesbzfa .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#puwmesbzfa .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#puwmesbzfa .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#puwmesbzfa .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#puwmesbzfa .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#puwmesbzfa .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#puwmesbzfa .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#puwmesbzfa .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#puwmesbzfa .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#puwmesbzfa .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#puwmesbzfa .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#puwmesbzfa .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#puwmesbzfa .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#puwmesbzfa .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puwmesbzfa .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#puwmesbzfa .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#puwmesbzfa .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#puwmesbzfa .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puwmesbzfa .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#puwmesbzfa .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puwmesbzfa .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#puwmesbzfa .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puwmesbzfa .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#puwmesbzfa .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puwmesbzfa .gt_left {
+  text-align: left;
+}
+
+#puwmesbzfa .gt_center {
+  text-align: center;
+}
+
+#puwmesbzfa .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#puwmesbzfa .gt_font_normal {
+  font-weight: normal;
+}
+
+#puwmesbzfa .gt_font_bold {
+  font-weight: bold;
+}
+
+#puwmesbzfa .gt_font_italic {
+  font-style: italic;
+}
+
+#puwmesbzfa .gt_super {
+  font-size: 65%;
+}
+
+#puwmesbzfa .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#puwmesbzfa .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#puwmesbzfa .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#puwmesbzfa .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#puwmesbzfa .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#puwmesbzfa .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#puwmesbzfa .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" style="table-layout: fixed;" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+  <colgroup>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col style="width:90px;">
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_title gt_font_normal" style="">ASEAN Trade by Country and Mode of Transport</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="">Values in million USD</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="Country">Country</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Mode">
+        <span class="gt_column_spanner">Mode</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" scope="col" id="Total">Total</th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Air">Air</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Water">Water</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Land">Land</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Not elsewhere classified">Not elsewhere classified</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unknown">Unknown</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2021 stub_1_1 Air" class="gt_row gt_right">761.1</td>
+<td headers="2021 stub_1_1 Water" class="gt_row gt_right">17,690.3</td>
+<td headers="2021 stub_1_1 Land" class="gt_row gt_right">234.3</td>
+<td headers="2021 stub_1_1 Not elsewhere classified" class="gt_row gt_right">0.3</td>
+<td headers="2021 stub_1_1 Unknown" class="gt_row gt_right">0.1</td>
+<td headers="2021 stub_1_1 Total" class="gt_row gt_right">18,686.0</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2021 stub_1_2 Air" class="gt_row gt_right">5,493.9</td>
+<td headers="2021 stub_1_2 Water" class="gt_row gt_right">25,953.5</td>
+<td headers="2021 stub_1_2 Land" class="gt_row gt_right">10,991.7</td>
+<td headers="2021 stub_1_2 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_2 Unknown" class="gt_row gt_right">1.1</td>
+<td headers="2021 stub_1_2 Total" class="gt_row gt_right">42,440.2</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2021 stub_1_3 Air" class="gt_row gt_right">32,865.4</td>
+<td headers="2021 stub_1_3 Water" class="gt_row gt_right">391,971.2</td>
+<td headers="2021 stub_1_3 Land" class="gt_row gt_right">28.5</td>
+<td headers="2021 stub_1_3 Not elsewhere classified" class="gt_row gt_right">2,934.5</td>
+<td headers="2021 stub_1_3 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_3 Total" class="gt_row gt_right">427,799.5</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2021 stub_1_4 Air" class="gt_row gt_right">1,035.2</td>
+<td headers="2021 stub_1_4 Water" class="gt_row gt_right">2.9</td>
+<td headers="2021 stub_1_4 Land" class="gt_row gt_right">10,297.8</td>
+<td headers="2021 stub_1_4 Not elsewhere classified" class="gt_row gt_right">2,248.9</td>
+<td headers="2021 stub_1_4 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_4 Total" class="gt_row gt_right">13,584.8</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2021 stub_1_5 Air" class="gt_row gt_right">166,439.9</td>
+<td headers="2021 stub_1_5 Water" class="gt_row gt_right">298,640.8</td>
+<td headers="2021 stub_1_5 Land" class="gt_row gt_right">71,656.8</td>
+<td headers="2021 stub_1_5 Not elsewhere classified" class="gt_row gt_right">764.1</td>
+<td headers="2021 stub_1_5 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_5 Total" class="gt_row gt_right">537,501.6</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2021 stub_1_6 Air" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Water" class="gt_row gt_right">20,834.3</td>
+<td headers="2021 stub_1_6 Land" class="gt_row gt_right">7,629.6</td>
+<td headers="2021 stub_1_6 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Total" class="gt_row gt_right">28,463.9</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2021 stub_1_7 Air" class="gt_row gt_right">75,155.6</td>
+<td headers="2021 stub_1_7 Water" class="gt_row gt_right">133,428.4</td>
+<td headers="2021 stub_1_7 Land" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Not elsewhere classified" class="gt_row gt_right">41.5</td>
+<td headers="2021 stub_1_7 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Total" class="gt_row gt_right">208,625.5</td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">Singapore<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_8 Air" class="gt_row gt_right">459,626.6</td>
+<td headers="2021 stub_1_8 Water" class="gt_row gt_right">326,753.3</td>
+<td headers="2021 stub_1_8 Land" class="gt_row gt_right">73,116.7</td>
+<td headers="2021 stub_1_8 Not elsewhere classified" class="gt_row gt_right">3,349.6</td>
+<td headers="2021 stub_1_8 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_8 Total" class="gt_row gt_right">862,846.2</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2021 stub_1_9 Air" class="gt_row gt_right">117,002.8</td>
+<td headers="2021 stub_1_9 Water" class="gt_row gt_right">363,861.8</td>
+<td headers="2021 stub_1_9 Land" class="gt_row gt_right">59,267.8</td>
+<td headers="2021 stub_1_9 Not elsewhere classified" class="gt_row gt_right">185.7</td>
+<td headers="2021 stub_1_9 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_9 Total" class="gt_row gt_right">540,318.2</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">Viet Nam<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_10 Air" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Water" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Land" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Not elsewhere classified" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Unknown" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Total" class="gt_row gt_right">666,544.9</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2022">2022</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2022 stub_1_11 Air" class="gt_row gt_right">842.1</td>
+<td headers="2022 stub_1_11 Water" class="gt_row gt_right">22,220.7</td>
+<td headers="2022 stub_1_11 Land" class="gt_row gt_right">277.4</td>
+<td headers="2022 stub_1_11 Not elsewhere classified" class="gt_row gt_right">0.2</td>
+<td headers="2022 stub_1_11 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_11 Total" class="gt_row gt_right">23,340.4</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2022 stub_1_12 Air" class="gt_row gt_right">6,675.0</td>
+<td headers="2022 stub_1_12 Water" class="gt_row gt_right">30,901.3</td>
+<td headers="2022 stub_1_12 Land" class="gt_row gt_right">13,166.8</td>
+<td headers="2022 stub_1_12 Not elsewhere classified" class="gt_row gt_right">4.2</td>
+<td headers="2022 stub_1_12 Unknown" class="gt_row gt_right">0.9</td>
+<td headers="2022 stub_1_12 Total" class="gt_row gt_right">50,748.2</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2022 stub_1_13 Air" class="gt_row gt_right">31,495.8</td>
+<td headers="2022 stub_1_13 Water" class="gt_row gt_right">494,665.3</td>
+<td headers="2022 stub_1_13 Land" class="gt_row gt_right">66.5</td>
+<td headers="2022 stub_1_13 Not elsewhere classified" class="gt_row gt_right">3,123.7</td>
+<td headers="2022 stub_1_13 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_13 Total" class="gt_row gt_right">529,351.4</td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2022 stub_1_14 Air" class="gt_row gt_right">994.8</td>
+<td headers="2022 stub_1_14 Water" class="gt_row gt_right">13.0</td>
+<td headers="2022 stub_1_14 Land" class="gt_row gt_right">13,770.7</td>
+<td headers="2022 stub_1_14 Not elsewhere classified" class="gt_row gt_right">2,401.3</td>
+<td headers="2022 stub_1_14 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_14 Total" class="gt_row gt_right">17,179.8</td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2022 stub_1_15 Air" class="gt_row gt_right">203,623.4</td>
+<td headers="2022 stub_1_15 Water" class="gt_row gt_right">368,091.9</td>
+<td headers="2022 stub_1_15 Land" class="gt_row gt_right">82,860.0</td>
+<td headers="2022 stub_1_15 Not elsewhere classified" class="gt_row gt_right">287.0</td>
+<td headers="2022 stub_1_15 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_15 Total" class="gt_row gt_right">654,862.3</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2022 stub_1_16 Air" class="gt_row gt_right">1,178.0</td>
+<td headers="2022 stub_1_16 Water" class="gt_row gt_right">25,268.6</td>
+<td headers="2022 stub_1_16 Land" class="gt_row gt_right">8,040.2</td>
+<td headers="2022 stub_1_16 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Total" class="gt_row gt_right">34,486.8</td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2022 stub_1_17 Air" class="gt_row gt_right">79,192.7</td>
+<td headers="2022 stub_1_17 Water" class="gt_row gt_right">144,917.3</td>
+<td headers="2022 stub_1_17 Land" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Total" class="gt_row gt_right">224,109.9</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub">Singapore</th>
+<td headers="2022 stub_1_18 Air" class="gt_row gt_right">499,260.5</td>
+<td headers="2022 stub_1_18 Water" class="gt_row gt_right">404,313.2</td>
+<td headers="2022 stub_1_18 Land" class="gt_row gt_right">82,483.0</td>
+<td headers="2022 stub_1_18 Not elsewhere classified" class="gt_row gt_right">4,060.7</td>
+<td headers="2022 stub_1_18 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_18 Total" class="gt_row gt_right">990,117.4</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2022 stub_1_19 Air" class="gt_row gt_right">129,243.0</td>
+<td headers="2022 stub_1_19 Water" class="gt_row gt_right">402,979.8</td>
+<td headers="2022 stub_1_19 Land" class="gt_row gt_right">57,540.3</td>
+<td headers="2022 stub_1_19 Not elsewhere classified" class="gt_row gt_right">2,525.1</td>
+<td headers="2022 stub_1_19 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_19 Total" class="gt_row gt_right">592,288.1</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub">Viet Nam</th>
+<td headers="2022 stub_1_20 Air" class="gt_row gt_right">218,472.6</td>
+<td headers="2022 stub_1_20 Water" class="gt_row gt_right">453,346.1</td>
+<td headers="2022 stub_1_20 Land" class="gt_row gt_right">42,024.0</td>
+<td headers="2022 stub_1_20 Not elsewhere classified" class="gt_row gt_right">8,154.8</td>
+<td headers="2022 stub_1_20 Unknown" class="gt_row gt_right">7,700.5</td>
+<td headers="2022 stub_1_20 Total" class="gt_row gt_right">729,698.0</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="7">ASEAN Secretariat (2024)</td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="7"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Data available in total</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="add-summary-rows" class="level1">
+<h1>Add summary rows</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gt_trade <span class="ot">&lt;-</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  gt_trade <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary_rows</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">fns =</span> <span class="st">"Annual total"</span> <span class="sc">~</span> <span class="fu">sum</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fmt =</span> <span class="sc">~</span> <span class="fu">fmt_number</span>(., <span class="at">decimals =</span> <span class="dv">1</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>gt_trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="shjezdlfqa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#shjezdlfqa table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#shjezdlfqa thead, #shjezdlfqa tbody, #shjezdlfqa tfoot, #shjezdlfqa tr, #shjezdlfqa td, #shjezdlfqa th {
+  border-style: none;
+}
+
+#shjezdlfqa p {
+  margin: 0;
+  padding: 0;
+}
+
+#shjezdlfqa .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#shjezdlfqa .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#shjezdlfqa .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#shjezdlfqa .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#shjezdlfqa .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#shjezdlfqa .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#shjezdlfqa .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#shjezdlfqa .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#shjezdlfqa .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#shjezdlfqa .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#shjezdlfqa .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#shjezdlfqa .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#shjezdlfqa .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#shjezdlfqa .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#shjezdlfqa .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#shjezdlfqa .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#shjezdlfqa .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#shjezdlfqa .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#shjezdlfqa .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#shjezdlfqa .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#shjezdlfqa .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#shjezdlfqa .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#shjezdlfqa .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#shjezdlfqa .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#shjezdlfqa .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#shjezdlfqa .gt_left {
+  text-align: left;
+}
+
+#shjezdlfqa .gt_center {
+  text-align: center;
+}
+
+#shjezdlfqa .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#shjezdlfqa .gt_font_normal {
+  font-weight: normal;
+}
+
+#shjezdlfqa .gt_font_bold {
+  font-weight: bold;
+}
+
+#shjezdlfqa .gt_font_italic {
+  font-style: italic;
+}
+
+#shjezdlfqa .gt_super {
+  font-size: 65%;
+}
+
+#shjezdlfqa .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#shjezdlfqa .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#shjezdlfqa .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#shjezdlfqa .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#shjezdlfqa .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#shjezdlfqa .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#shjezdlfqa .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" style="table-layout: fixed;" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+  <colgroup>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col style="width:90px;">
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_title gt_font_normal" style="">ASEAN Trade by Country and Mode of Transport</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="">Values in million USD</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="Country">Country</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Mode">
+        <span class="gt_column_spanner">Mode</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" scope="col" id="Total">Total</th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Air">Air</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Water">Water</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Land">Land</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Not elsewhere classified">Not elsewhere classified</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unknown">Unknown</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2021 stub_1_1 Air" class="gt_row gt_right">761.1</td>
+<td headers="2021 stub_1_1 Water" class="gt_row gt_right">17,690.3</td>
+<td headers="2021 stub_1_1 Land" class="gt_row gt_right">234.3</td>
+<td headers="2021 stub_1_1 Not elsewhere classified" class="gt_row gt_right">0.3</td>
+<td headers="2021 stub_1_1 Unknown" class="gt_row gt_right">0.1</td>
+<td headers="2021 stub_1_1 Total" class="gt_row gt_right">18,686.0</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2021 stub_1_2 Air" class="gt_row gt_right">5,493.9</td>
+<td headers="2021 stub_1_2 Water" class="gt_row gt_right">25,953.5</td>
+<td headers="2021 stub_1_2 Land" class="gt_row gt_right">10,991.7</td>
+<td headers="2021 stub_1_2 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_2 Unknown" class="gt_row gt_right">1.1</td>
+<td headers="2021 stub_1_2 Total" class="gt_row gt_right">42,440.2</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2021 stub_1_3 Air" class="gt_row gt_right">32,865.4</td>
+<td headers="2021 stub_1_3 Water" class="gt_row gt_right">391,971.2</td>
+<td headers="2021 stub_1_3 Land" class="gt_row gt_right">28.5</td>
+<td headers="2021 stub_1_3 Not elsewhere classified" class="gt_row gt_right">2,934.5</td>
+<td headers="2021 stub_1_3 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_3 Total" class="gt_row gt_right">427,799.5</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2021 stub_1_4 Air" class="gt_row gt_right">1,035.2</td>
+<td headers="2021 stub_1_4 Water" class="gt_row gt_right">2.9</td>
+<td headers="2021 stub_1_4 Land" class="gt_row gt_right">10,297.8</td>
+<td headers="2021 stub_1_4 Not elsewhere classified" class="gt_row gt_right">2,248.9</td>
+<td headers="2021 stub_1_4 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_4 Total" class="gt_row gt_right">13,584.8</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2021 stub_1_5 Air" class="gt_row gt_right">166,439.9</td>
+<td headers="2021 stub_1_5 Water" class="gt_row gt_right">298,640.8</td>
+<td headers="2021 stub_1_5 Land" class="gt_row gt_right">71,656.8</td>
+<td headers="2021 stub_1_5 Not elsewhere classified" class="gt_row gt_right">764.1</td>
+<td headers="2021 stub_1_5 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_5 Total" class="gt_row gt_right">537,501.6</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2021 stub_1_6 Air" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Water" class="gt_row gt_right">20,834.3</td>
+<td headers="2021 stub_1_6 Land" class="gt_row gt_right">7,629.6</td>
+<td headers="2021 stub_1_6 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Total" class="gt_row gt_right">28,463.9</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2021 stub_1_7 Air" class="gt_row gt_right">75,155.6</td>
+<td headers="2021 stub_1_7 Water" class="gt_row gt_right">133,428.4</td>
+<td headers="2021 stub_1_7 Land" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Not elsewhere classified" class="gt_row gt_right">41.5</td>
+<td headers="2021 stub_1_7 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Total" class="gt_row gt_right">208,625.5</td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">Singapore<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_8 Air" class="gt_row gt_right">459,626.6</td>
+<td headers="2021 stub_1_8 Water" class="gt_row gt_right">326,753.3</td>
+<td headers="2021 stub_1_8 Land" class="gt_row gt_right">73,116.7</td>
+<td headers="2021 stub_1_8 Not elsewhere classified" class="gt_row gt_right">3,349.6</td>
+<td headers="2021 stub_1_8 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_8 Total" class="gt_row gt_right">862,846.2</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2021 stub_1_9 Air" class="gt_row gt_right">117,002.8</td>
+<td headers="2021 stub_1_9 Water" class="gt_row gt_right">363,861.8</td>
+<td headers="2021 stub_1_9 Land" class="gt_row gt_right">59,267.8</td>
+<td headers="2021 stub_1_9 Not elsewhere classified" class="gt_row gt_right">185.7</td>
+<td headers="2021 stub_1_9 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_9 Total" class="gt_row gt_right">540,318.2</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">Viet Nam<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_10 Air" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Water" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Land" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Not elsewhere classified" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Unknown" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Total" class="gt_row gt_right">666,544.9</td></tr>
+    <tr><th id="summary_stub_2021_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Annual total</th>
+<td headers="2021 summary_stub_2021_1 Air" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">858,380.6</td>
+<td headers="2021 summary_stub_2021_1 Water" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">1,579,136.5</td>
+<td headers="2021 summary_stub_2021_1 Land" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">233,223.2</td>
+<td headers="2021 summary_stub_2021_1 Not elsewhere classified" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">9,524.5</td>
+<td headers="2021 summary_stub_2021_1 Unknown" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">1.1</td>
+<td headers="2021 summary_stub_2021_1 Total" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">3,346,810.8</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2022">2022</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub">Brunei Darussalam</th>
+<td headers="2022 stub_1_11 Air" class="gt_row gt_right">842.1</td>
+<td headers="2022 stub_1_11 Water" class="gt_row gt_right">22,220.7</td>
+<td headers="2022 stub_1_11 Land" class="gt_row gt_right">277.4</td>
+<td headers="2022 stub_1_11 Not elsewhere classified" class="gt_row gt_right">0.2</td>
+<td headers="2022 stub_1_11 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_11 Total" class="gt_row gt_right">23,340.4</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub">Cambodia</th>
+<td headers="2022 stub_1_12 Air" class="gt_row gt_right">6,675.0</td>
+<td headers="2022 stub_1_12 Water" class="gt_row gt_right">30,901.3</td>
+<td headers="2022 stub_1_12 Land" class="gt_row gt_right">13,166.8</td>
+<td headers="2022 stub_1_12 Not elsewhere classified" class="gt_row gt_right">4.2</td>
+<td headers="2022 stub_1_12 Unknown" class="gt_row gt_right">0.9</td>
+<td headers="2022 stub_1_12 Total" class="gt_row gt_right">50,748.2</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub">Indonesia</th>
+<td headers="2022 stub_1_13 Air" class="gt_row gt_right">31,495.8</td>
+<td headers="2022 stub_1_13 Water" class="gt_row gt_right">494,665.3</td>
+<td headers="2022 stub_1_13 Land" class="gt_row gt_right">66.5</td>
+<td headers="2022 stub_1_13 Not elsewhere classified" class="gt_row gt_right">3,123.7</td>
+<td headers="2022 stub_1_13 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_13 Total" class="gt_row gt_right">529,351.4</td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub">Lao PDR</th>
+<td headers="2022 stub_1_14 Air" class="gt_row gt_right">994.8</td>
+<td headers="2022 stub_1_14 Water" class="gt_row gt_right">13.0</td>
+<td headers="2022 stub_1_14 Land" class="gt_row gt_right">13,770.7</td>
+<td headers="2022 stub_1_14 Not elsewhere classified" class="gt_row gt_right">2,401.3</td>
+<td headers="2022 stub_1_14 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_14 Total" class="gt_row gt_right">17,179.8</td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub">Malaysia</th>
+<td headers="2022 stub_1_15 Air" class="gt_row gt_right">203,623.4</td>
+<td headers="2022 stub_1_15 Water" class="gt_row gt_right">368,091.9</td>
+<td headers="2022 stub_1_15 Land" class="gt_row gt_right">82,860.0</td>
+<td headers="2022 stub_1_15 Not elsewhere classified" class="gt_row gt_right">287.0</td>
+<td headers="2022 stub_1_15 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_15 Total" class="gt_row gt_right">654,862.3</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub">Myanmar</th>
+<td headers="2022 stub_1_16 Air" class="gt_row gt_right">1,178.0</td>
+<td headers="2022 stub_1_16 Water" class="gt_row gt_right">25,268.6</td>
+<td headers="2022 stub_1_16 Land" class="gt_row gt_right">8,040.2</td>
+<td headers="2022 stub_1_16 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Total" class="gt_row gt_right">34,486.8</td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub">Philippines</th>
+<td headers="2022 stub_1_17 Air" class="gt_row gt_right">79,192.7</td>
+<td headers="2022 stub_1_17 Water" class="gt_row gt_right">144,917.3</td>
+<td headers="2022 stub_1_17 Land" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Total" class="gt_row gt_right">224,109.9</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub">Singapore</th>
+<td headers="2022 stub_1_18 Air" class="gt_row gt_right">499,260.5</td>
+<td headers="2022 stub_1_18 Water" class="gt_row gt_right">404,313.2</td>
+<td headers="2022 stub_1_18 Land" class="gt_row gt_right">82,483.0</td>
+<td headers="2022 stub_1_18 Not elsewhere classified" class="gt_row gt_right">4,060.7</td>
+<td headers="2022 stub_1_18 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_18 Total" class="gt_row gt_right">990,117.4</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub">Thailand</th>
+<td headers="2022 stub_1_19 Air" class="gt_row gt_right">129,243.0</td>
+<td headers="2022 stub_1_19 Water" class="gt_row gt_right">402,979.8</td>
+<td headers="2022 stub_1_19 Land" class="gt_row gt_right">57,540.3</td>
+<td headers="2022 stub_1_19 Not elsewhere classified" class="gt_row gt_right">2,525.1</td>
+<td headers="2022 stub_1_19 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_19 Total" class="gt_row gt_right">592,288.1</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub">Viet Nam</th>
+<td headers="2022 stub_1_20 Air" class="gt_row gt_right">218,472.6</td>
+<td headers="2022 stub_1_20 Water" class="gt_row gt_right">453,346.1</td>
+<td headers="2022 stub_1_20 Land" class="gt_row gt_right">42,024.0</td>
+<td headers="2022 stub_1_20 Not elsewhere classified" class="gt_row gt_right">8,154.8</td>
+<td headers="2022 stub_1_20 Unknown" class="gt_row gt_right">7,700.5</td>
+<td headers="2022 stub_1_20 Total" class="gt_row gt_right">729,698.0</td></tr>
+    <tr><th id="summary_stub_2022_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Annual total</th>
+<td headers="2022 summary_stub_2022_1 Air" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">1,170,977.9</td>
+<td headers="2022 summary_stub_2022_1 Water" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">2,346,717.1</td>
+<td headers="2022 summary_stub_2022_1 Land" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">300,228.9</td>
+<td headers="2022 summary_stub_2022_1 Not elsewhere classified" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">20,557.1</td>
+<td headers="2022 summary_stub_2022_1 Unknown" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">7,701.4</td>
+<td headers="2022 summary_stub_2022_1 Total" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">3,846,182.4</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="7">ASEAN Secretariat (2024)</td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="7"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Data available in total</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="styling" class="level1">
+<h1>Styling</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># color url: http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>gt_trade <span class="ot">&lt;-</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  gt_trade <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"gray90"</span>),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>, <span class="at">style =</span> <span class="st">"italic"</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_title</span>()</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"aliceblue"</span>),</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">list</span>(<span class="fu">cells_stubhead</span>(), <span class="fu">cells_stub</span>())</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>gt_trade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="lpdrapwadi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lpdrapwadi table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#lpdrapwadi thead, #lpdrapwadi tbody, #lpdrapwadi tfoot, #lpdrapwadi tr, #lpdrapwadi td, #lpdrapwadi th {
+  border-style: none;
+}
+
+#lpdrapwadi p {
+  margin: 0;
+  padding: 0;
+}
+
+#lpdrapwadi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#lpdrapwadi .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lpdrapwadi .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lpdrapwadi .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#lpdrapwadi .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#lpdrapwadi .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#lpdrapwadi .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#lpdrapwadi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#lpdrapwadi .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#lpdrapwadi .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#lpdrapwadi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lpdrapwadi .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#lpdrapwadi .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#lpdrapwadi .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#lpdrapwadi .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpdrapwadi .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#lpdrapwadi .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#lpdrapwadi .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#lpdrapwadi .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpdrapwadi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#lpdrapwadi .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpdrapwadi .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#lpdrapwadi .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpdrapwadi .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lpdrapwadi .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpdrapwadi .gt_left {
+  text-align: left;
+}
+
+#lpdrapwadi .gt_center {
+  text-align: center;
+}
+
+#lpdrapwadi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lpdrapwadi .gt_font_normal {
+  font-weight: normal;
+}
+
+#lpdrapwadi .gt_font_bold {
+  font-weight: bold;
+}
+
+#lpdrapwadi .gt_font_italic {
+  font-style: italic;
+}
+
+#lpdrapwadi .gt_super {
+  font-size: 65%;
+}
+
+#lpdrapwadi .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#lpdrapwadi .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#lpdrapwadi .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#lpdrapwadi .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#lpdrapwadi .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#lpdrapwadi .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#lpdrapwadi .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" style="table-layout: fixed;" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+  <colgroup>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col style="width:90px;">
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_title gt_font_normal" style="background-color: #E5E5E5; font-style: italic; font-weight: bold;">ASEAN Trade by Country and Mode of Transport</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="background-color: #E5E5E5; font-style: italic; font-weight: bold;">Values in million USD</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="background-color: #F0F8FF;" scope="col" id="Country">Country</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Mode">
+        <span class="gt_column_spanner">Mode</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" scope="col" id="Total">Total</th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Air">Air</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Water">Water</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Land">Land</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Not elsewhere classified">Not elsewhere classified</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unknown">Unknown</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2021">2021</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Brunei Darussalam</th>
+<td headers="2021 stub_1_1 Air" class="gt_row gt_right">761.1</td>
+<td headers="2021 stub_1_1 Water" class="gt_row gt_right">17,690.3</td>
+<td headers="2021 stub_1_1 Land" class="gt_row gt_right">234.3</td>
+<td headers="2021 stub_1_1 Not elsewhere classified" class="gt_row gt_right">0.3</td>
+<td headers="2021 stub_1_1 Unknown" class="gt_row gt_right">0.1</td>
+<td headers="2021 stub_1_1 Total" class="gt_row gt_right">18,686.0</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Cambodia</th>
+<td headers="2021 stub_1_2 Air" class="gt_row gt_right">5,493.9</td>
+<td headers="2021 stub_1_2 Water" class="gt_row gt_right">25,953.5</td>
+<td headers="2021 stub_1_2 Land" class="gt_row gt_right">10,991.7</td>
+<td headers="2021 stub_1_2 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_2 Unknown" class="gt_row gt_right">1.1</td>
+<td headers="2021 stub_1_2 Total" class="gt_row gt_right">42,440.2</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Indonesia</th>
+<td headers="2021 stub_1_3 Air" class="gt_row gt_right">32,865.4</td>
+<td headers="2021 stub_1_3 Water" class="gt_row gt_right">391,971.2</td>
+<td headers="2021 stub_1_3 Land" class="gt_row gt_right">28.5</td>
+<td headers="2021 stub_1_3 Not elsewhere classified" class="gt_row gt_right">2,934.5</td>
+<td headers="2021 stub_1_3 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_3 Total" class="gt_row gt_right">427,799.5</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Lao PDR</th>
+<td headers="2021 stub_1_4 Air" class="gt_row gt_right">1,035.2</td>
+<td headers="2021 stub_1_4 Water" class="gt_row gt_right">2.9</td>
+<td headers="2021 stub_1_4 Land" class="gt_row gt_right">10,297.8</td>
+<td headers="2021 stub_1_4 Not elsewhere classified" class="gt_row gt_right">2,248.9</td>
+<td headers="2021 stub_1_4 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_4 Total" class="gt_row gt_right">13,584.8</td></tr>
+    <tr><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Malaysia</th>
+<td headers="2021 stub_1_5 Air" class="gt_row gt_right">166,439.9</td>
+<td headers="2021 stub_1_5 Water" class="gt_row gt_right">298,640.8</td>
+<td headers="2021 stub_1_5 Land" class="gt_row gt_right">71,656.8</td>
+<td headers="2021 stub_1_5 Not elsewhere classified" class="gt_row gt_right">764.1</td>
+<td headers="2021 stub_1_5 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_5 Total" class="gt_row gt_right">537,501.6</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Myanmar</th>
+<td headers="2021 stub_1_6 Air" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Water" class="gt_row gt_right">20,834.3</td>
+<td headers="2021 stub_1_6 Land" class="gt_row gt_right">7,629.6</td>
+<td headers="2021 stub_1_6 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_6 Total" class="gt_row gt_right">28,463.9</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Philippines</th>
+<td headers="2021 stub_1_7 Air" class="gt_row gt_right">75,155.6</td>
+<td headers="2021 stub_1_7 Water" class="gt_row gt_right">133,428.4</td>
+<td headers="2021 stub_1_7 Land" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Not elsewhere classified" class="gt_row gt_right">41.5</td>
+<td headers="2021 stub_1_7 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_7 Total" class="gt_row gt_right">208,625.5</td></tr>
+    <tr><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Singapore<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_8 Air" class="gt_row gt_right">459,626.6</td>
+<td headers="2021 stub_1_8 Water" class="gt_row gt_right">326,753.3</td>
+<td headers="2021 stub_1_8 Land" class="gt_row gt_right">73,116.7</td>
+<td headers="2021 stub_1_8 Not elsewhere classified" class="gt_row gt_right">3,349.6</td>
+<td headers="2021 stub_1_8 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_8 Total" class="gt_row gt_right">862,846.2</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Thailand</th>
+<td headers="2021 stub_1_9 Air" class="gt_row gt_right">117,002.8</td>
+<td headers="2021 stub_1_9 Water" class="gt_row gt_right">363,861.8</td>
+<td headers="2021 stub_1_9 Land" class="gt_row gt_right">59,267.8</td>
+<td headers="2021 stub_1_9 Not elsewhere classified" class="gt_row gt_right">185.7</td>
+<td headers="2021 stub_1_9 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2021 stub_1_9 Total" class="gt_row gt_right">540,318.2</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Viet Nam<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+<td headers="2021 stub_1_10 Air" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Water" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Land" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Not elsewhere classified" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Unknown" class="gt_row gt_right">—</td>
+<td headers="2021 stub_1_10 Total" class="gt_row gt_right">666,544.9</td></tr>
+    <tr><th id="summary_stub_2021_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Annual total</th>
+<td headers="2021 summary_stub_2021_1 Air" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">858,380.6</td>
+<td headers="2021 summary_stub_2021_1 Water" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">1,579,136.5</td>
+<td headers="2021 summary_stub_2021_1 Land" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">233,223.2</td>
+<td headers="2021 summary_stub_2021_1 Not elsewhere classified" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">9,524.5</td>
+<td headers="2021 summary_stub_2021_1 Unknown" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">1.1</td>
+<td headers="2021 summary_stub_2021_1 Total" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">3,346,810.8</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="7" class="gt_group_heading" scope="colgroup" id="2022">2022</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_11" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Brunei Darussalam</th>
+<td headers="2022 stub_1_11 Air" class="gt_row gt_right">842.1</td>
+<td headers="2022 stub_1_11 Water" class="gt_row gt_right">22,220.7</td>
+<td headers="2022 stub_1_11 Land" class="gt_row gt_right">277.4</td>
+<td headers="2022 stub_1_11 Not elsewhere classified" class="gt_row gt_right">0.2</td>
+<td headers="2022 stub_1_11 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_11 Total" class="gt_row gt_right">23,340.4</td></tr>
+    <tr><th id="stub_1_12" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Cambodia</th>
+<td headers="2022 stub_1_12 Air" class="gt_row gt_right">6,675.0</td>
+<td headers="2022 stub_1_12 Water" class="gt_row gt_right">30,901.3</td>
+<td headers="2022 stub_1_12 Land" class="gt_row gt_right">13,166.8</td>
+<td headers="2022 stub_1_12 Not elsewhere classified" class="gt_row gt_right">4.2</td>
+<td headers="2022 stub_1_12 Unknown" class="gt_row gt_right">0.9</td>
+<td headers="2022 stub_1_12 Total" class="gt_row gt_right">50,748.2</td></tr>
+    <tr><th id="stub_1_13" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Indonesia</th>
+<td headers="2022 stub_1_13 Air" class="gt_row gt_right">31,495.8</td>
+<td headers="2022 stub_1_13 Water" class="gt_row gt_right">494,665.3</td>
+<td headers="2022 stub_1_13 Land" class="gt_row gt_right">66.5</td>
+<td headers="2022 stub_1_13 Not elsewhere classified" class="gt_row gt_right">3,123.7</td>
+<td headers="2022 stub_1_13 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_13 Total" class="gt_row gt_right">529,351.4</td></tr>
+    <tr><th id="stub_1_14" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Lao PDR</th>
+<td headers="2022 stub_1_14 Air" class="gt_row gt_right">994.8</td>
+<td headers="2022 stub_1_14 Water" class="gt_row gt_right">13.0</td>
+<td headers="2022 stub_1_14 Land" class="gt_row gt_right">13,770.7</td>
+<td headers="2022 stub_1_14 Not elsewhere classified" class="gt_row gt_right">2,401.3</td>
+<td headers="2022 stub_1_14 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_14 Total" class="gt_row gt_right">17,179.8</td></tr>
+    <tr><th id="stub_1_15" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Malaysia</th>
+<td headers="2022 stub_1_15 Air" class="gt_row gt_right">203,623.4</td>
+<td headers="2022 stub_1_15 Water" class="gt_row gt_right">368,091.9</td>
+<td headers="2022 stub_1_15 Land" class="gt_row gt_right">82,860.0</td>
+<td headers="2022 stub_1_15 Not elsewhere classified" class="gt_row gt_right">287.0</td>
+<td headers="2022 stub_1_15 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_15 Total" class="gt_row gt_right">654,862.3</td></tr>
+    <tr><th id="stub_1_16" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Myanmar</th>
+<td headers="2022 stub_1_16 Air" class="gt_row gt_right">1,178.0</td>
+<td headers="2022 stub_1_16 Water" class="gt_row gt_right">25,268.6</td>
+<td headers="2022 stub_1_16 Land" class="gt_row gt_right">8,040.2</td>
+<td headers="2022 stub_1_16 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_16 Total" class="gt_row gt_right">34,486.8</td></tr>
+    <tr><th id="stub_1_17" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Philippines</th>
+<td headers="2022 stub_1_17 Air" class="gt_row gt_right">79,192.7</td>
+<td headers="2022 stub_1_17 Water" class="gt_row gt_right">144,917.3</td>
+<td headers="2022 stub_1_17 Land" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Not elsewhere classified" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_17 Total" class="gt_row gt_right">224,109.9</td></tr>
+    <tr><th id="stub_1_18" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Singapore</th>
+<td headers="2022 stub_1_18 Air" class="gt_row gt_right">499,260.5</td>
+<td headers="2022 stub_1_18 Water" class="gt_row gt_right">404,313.2</td>
+<td headers="2022 stub_1_18 Land" class="gt_row gt_right">82,483.0</td>
+<td headers="2022 stub_1_18 Not elsewhere classified" class="gt_row gt_right">4,060.7</td>
+<td headers="2022 stub_1_18 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_18 Total" class="gt_row gt_right">990,117.4</td></tr>
+    <tr><th id="stub_1_19" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Thailand</th>
+<td headers="2022 stub_1_19 Air" class="gt_row gt_right">129,243.0</td>
+<td headers="2022 stub_1_19 Water" class="gt_row gt_right">402,979.8</td>
+<td headers="2022 stub_1_19 Land" class="gt_row gt_right">57,540.3</td>
+<td headers="2022 stub_1_19 Not elsewhere classified" class="gt_row gt_right">2,525.1</td>
+<td headers="2022 stub_1_19 Unknown" class="gt_row gt_right">0.0</td>
+<td headers="2022 stub_1_19 Total" class="gt_row gt_right">592,288.1</td></tr>
+    <tr><th id="stub_1_20" scope="row" class="gt_row gt_left gt_stub" style="background-color: #F0F8FF;">Viet Nam</th>
+<td headers="2022 stub_1_20 Air" class="gt_row gt_right">218,472.6</td>
+<td headers="2022 stub_1_20 Water" class="gt_row gt_right">453,346.1</td>
+<td headers="2022 stub_1_20 Land" class="gt_row gt_right">42,024.0</td>
+<td headers="2022 stub_1_20 Not elsewhere classified" class="gt_row gt_right">8,154.8</td>
+<td headers="2022 stub_1_20 Unknown" class="gt_row gt_right">7,700.5</td>
+<td headers="2022 stub_1_20 Total" class="gt_row gt_right">729,698.0</td></tr>
+    <tr><th id="summary_stub_2022_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Annual total</th>
+<td headers="2022 summary_stub_2022_1 Air" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">1,170,977.9</td>
+<td headers="2022 summary_stub_2022_1 Water" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">2,346,717.1</td>
+<td headers="2022 summary_stub_2022_1 Land" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">300,228.9</td>
+<td headers="2022 summary_stub_2022_1 Not elsewhere classified" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">20,557.1</td>
+<td headers="2022 summary_stub_2022_1 Unknown" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">7,701.4</td>
+<td headers="2022 summary_stub_2022_1 Total" class="gt_row gt_right gt_summary_row gt_first_summary_row thick gt_last_summary_row">3,846,182.4</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="7">ASEAN Secretariat (2024)</td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="7"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Data available in total</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

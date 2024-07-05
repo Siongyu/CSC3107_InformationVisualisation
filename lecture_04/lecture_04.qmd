@@ -1,0 +1,307 @@
+---
+title: "lecture_04"
+format: html
+editor: visual
+---
+
+For this lecture, I need the following packages:
+
+```{r}
+#| label: setup
+#| message: false
+
+library(tidyverse)
+library(astsa)
+library(ggrepel)
+```
+
+# Factors
+
+```{r}
+state.name
+class(state.name)
+
+# state.name is a character vector because each of the elements is a string, bounded by quotation marks.
+```
+
+```{r}
+state.region
+class(state.region)
+
+# state.region is a factor because it is a vector of integers, each of which is a reference to a level in the factor.
+```
+
+```{r}
+sizes <- factor(
+  c("Pomposo", "Colossale", "Pomposo", "Regolare", "Piccolo"),
+  levels = c("Modesto", "Regolare", "Pomposo", "Colossale")
+)
+
+levels(sizes)
+nlevels(sizes)
+abbreviated_sizes <- fct_recode(
+  sizes,
+  m = "Modesto",
+  r = "Regolare",
+  p = "Pomposo",
+  c = "Colossale",
+)
+
+abbreviated_sizes
+```
+
+Data from US General Social Survey (part of forcats package):
+
+```{r}
+gss_cat
+head(gss_cat$denom)
+```
+
+Subset of Protestants only:
+
+```{r}
+protestant_denom <- 
+  filter(gss_cat, relig == "Protestant") |>
+  pull(denom)
+class(protestant_denom)
+fct_count(protestant_denom)
+denom_descending <- fct_infreq(protestant_denom)
+levels(denom_descending)
+fct_count(denom_descending)
+```
+
+```{r}
+sizes[1] < sizes[2]
+```
+
+# Functions
+
+```{r}
+say_hello <- function(name = "world", ...) {
+  message("Hello, ", name, "!")
+}
+
+say_hello()
+say_hello("michael")
+```
+
+# Scatter Plots
+
+Define input for ggplot2 as a data frame.
+
+```{r}
+# ggplot2 doesn't work with vector
+
+dfr <- tribble(
+  ~x_col, ~y_col,
+  3, -1,
+  0, -2,
+  1, 2
+)
+
+dfr
+```
+
+Make a scatter plot of these data:
+
+```{r}
+#| label: scatter
+#| layout-ncol: 2
+#| fig-width: 3 # default is 7
+#| fig-height: 3 # default is 7
+
+ggplot(dfr, aes(x=x_col, y=y_col)) + 
+  geom_point() +
+  geom_path() +
+  labs(title = "Path")
+
+ggplot(dfr, aes(x=x_col, y=y_col)) + 
+  geom_point() +
+  geom_line() +
+  labs(title = "Line")
+```
+
+```{r}
+#| label: scatter2
+#| layout-ncol: 2
+
+pelts <- tibble(
+  hare = as.numeric(Hare),
+  lynx = as.numeric(Lynx),
+  year = as.integer(time(Hare))
+)
+
+ggplot(pelts, aes(x=hare, y=lynx, color = year)) +
+  geom_point() +
+  geom_path() +
+  labs(title = "Path")
+
+ggplot(pelts, aes(x=hare, y=lynx, color = year)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Line")
+```
+
+```{r}
+#| label: scatter3
+#| layout-ncol: 2
+
+pelts_long <- pivot_longer(
+  pelts,
+  c(hare, lynx),
+  names_to = "species",
+  values_to = "thousands"
+)
+
+pelts
+
+pelts_long
+
+pelts_long <- slice_sample(pelts_long, n = nrow(pelts_long))
+
+ggplot(pelts_long, aes(x=year, y=thousands, color=species)) +
+  geom_path() +
+  labs(title = "Path")
+
+ggplot(pelts_long, aes(x=year, y=thousands, color=species)) +
+  geom_line() +
+  labs(title = "Line")
+
+# use geom_line() when the data is of chronological order and have progression in time
+```
+
+# Dealing with Overplotting
+
+```{r}
+#| label: iris
+
+ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+  geom_point()
+```
+
+```{r}
+anyDuplicated(select(iris, Sepal.Length, Petal.Length)) > 0
+```
+
+```{r}
+#| label: jitter
+#| layout-ncol: 2
+
+ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+  geom_point() +
+  labs(title = "Points")
+
+ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+  geom_jitter(alpha = 0.5) + 
+  labs(title = "Jitter")
+```
+
+```{r}
+#| label: count
+#| layout-ncol: 2
+
+ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+  geom_point() +
+  labs(title = "Points")
+
+ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+  geom_count(alpha = 0.5) +
+  scale_size_area() +
+  labs(title = "Count")
+```
+
+# Visualising Quantitative Distributions
+
+Example: Distribution of iris sepal lengths.
+
+```{r}
+#| layout-ncol: 2
+
+ggplot(iris, aes(Sepal.Length)) +
+  geom_histogram(fill = NA, color="black", bins=20)
+#ggplot(iris, aes(Sepal.Length)) +
+#  geom_histogram(fill = NA, color="black", bins=40)
+ggplot(iris, aes(Sepal.Length)) +
+  geom_freqpoly(bins=20)
+```
+
+```{r}
+#| layout-ncol: 2
+
+ggplot(iris, aes(Sepal.Length, fill = Species)) +
+  geom_histogram(color="black", bins=20)
+ggplot(iris, aes(Sepal.Length, color=Species)) +
+  geom_freqpoly(bins=20)
+```
+
+```{r}
+ggplot(iris, aes(Sepal.Length)) +
+  geom_histogram(bins=20, fill=NA, color="black") +
+  geom_rug(aes(y=0),position=position_jitter(height=0)) +
+  facet_wrap(~Species, ncol=1)
+```
+
+```{r}
+ggplot(iris, aes(Sepal.Length, Species)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(iris, aes(Sepal.Length, Species)) +
+  geom_violin() +
+  geom_boxplot(width=0.1)
+```
+
+# Visualising Categorical Distributions
+
+## Single-category bar chart
+
+Example: Party affiliations of respondents to the US General Social Survey.
+
+```{r}
+#| layout-ncol: 2
+
+ggplot(gss_cat, aes(x=partyid)) +
+  geom_bar()
+ggplot(gss_cat, aes(y=partyid)) +
+  geom_bar()
+```
+
+## Two-category bar chart
+
+Example: Party affiliations of respondents to the US General Social Survey, broken down by martial status.
+
+```{r}
+#| layout-ncol: 2
+
+ggplot(gss_cat, aes(y=partyid, fill = marital)) +
+  geom_bar()
+ggplot(gss_cat, aes(y=partyid, fill = marital)) +
+  geom_bar(position="dodge")
+```
+
+## What if data are already aggregated into counts?
+
+Example: Counts of party affiliations.
+
+```{r}
+gss_by_partyid <- count(gss_cat, partyid)
+ggplot(gss_by_partyid, aes(x=n,y=partyid)) +
+  geom_col()
+```
+
+# Text as a Geom
+
+Example: Nobel Prizes
+
+```{r}
+#| layout_ncol: 2
+
+nobel <- read_csv("nobel.csv")
+ggplot(nobel, aes(x=chocolate, y=prizes_per_10m, label=country)) +
+  geom_point() +
+  geom_text(vjust=0, nudge_y=0.5)
+ggplot(nobel, aes(x=chocolate, y=prizes_per_10m, label=country)) +
+  geom_point() +
+  geom_text_repel()
+```

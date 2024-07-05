@@ -1,0 +1,218 @@
+---
+title: "lecture 05"
+format: html
+editor: visual
+execute:
+  opts_chunk:
+    message: false
+    fig.align: "center"
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(gapminder)
+library(scales)
+```
+
+# Theme
+
+Theme determines the "superficial" appearance of the plot (eg. background color, font),
+
+```{r}
+ggplot(gss_cat, aes(y=partyid)) +
+  geom_bar() +
+  theme_minimal() +
+  theme(panel.grid=element_line(color="black"))
+```
+
+# Color
+
+## Color for Unordered Categorical Variables
+
+```{r}
+ggplot(iris, aes(Sepal.Length, color=Species)) +
+  geom_freqpoly(bins=20)
+```
+
+## Color for Ordered Categorical Variables
+
+```{r}
+ggplot(diamonds, aes(y=clarity, fill=cut)) +
+  geom_bar()
+```
+
+## Colors for Quantitative Data
+
+Only use color for quantitative data if the data are intensive. That is, the quantities can be reasonably expected to be independent of the number of data points.
+
+Example: Hours spent matching TV by age group
+
+```{r}
+tv <-
+  gss_cat |>
+    drop_na(age, tvhours) |>
+    count(age, tvhours, name="count") |>
+    mutate(
+      cohort_size = sum(count),
+      pct = (count / cohort_size) * 100,
+      .by = age
+    )
+
+ggplot(tv, aes(x=tvhours, y=age, fill=pct)) +
+  geom_tile()
+```
+
+# Symbol Size
+
+Never use size for categorical variables. Size should be used for quantitative data only if the data are extensive. That is, the quantities can be reasonably expected to scale in proportion to the number of data points.
+
+```{r}
+ggplot(gapminder, aes(x=gdpPercap, y=lifeExp, color=continent, size=pop)) +
+  geom_point()
+```
+
+## Shape
+
+Only use shape for unordered categorical data.
+
+```{r}
+#| layout-ncol: 2
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, shape=Species)) +
+  geom_point()
+ggplot(iris, aes(
+  x=Sepal.Length, 
+  y=Sepal.Width, 
+  color=Species,
+  shape=Species)
+) +
+  geom_point(size=2)
+```
+
+## Statistical Weight as an Aesthetic Mapping
+
+```{r}
+ggplot(
+  filter(gapminder, year==2007),
+  aes(x=gdpPercap, y=lifeExp)
+) +
+  geom_point(aes(color=continent, size=pop)) +
+  geom_smooth() +
+  geom_smooth(aes(weight=pop), color="black")
+```
+
+# Scales
+
+## Continuous Scales
+
+```{r}
+ims <- filter(gapminder, country %in% c("Indonesia", "Malaysia", "Singapore")) 
+
+ggplot(ims, aes(x=gdpPercap, y=lifeExp, group=country)) +
+  geom_point(aes(color=year, size=pop)) + 
+  geom_path(aes(color=year)) +
+  geom_text(aes(label=country), slice_max(ims, year), vjust=0, nudge_y=2) +
+  scale_x_continuous(limits=c(0,50000)) +
+  scale_color_continuous(limits=c(1900, 2025)) +
+  scale_size_continuous(
+    limits=c(0, 1e9),
+    breaks=c(1e6, 1e7, 1e8, 1e9),
+    labels=c("1M", "10M", "100M", "1B")
+  )
+```
+
+Using helper functions from the scales package (`label_*()`):
+
+```{r}
+ims <- filter(gapminder, country %in% c("Indonesia", "Malaysia", "Singapore")) 
+
+ggplot(ims, aes(x=gdpPercap, y=lifeExp, group=country)) +
+  geom_point(aes(color=year, size=pop)) + 
+  geom_path(aes(color=year)) +
+  geom_text(aes(label=country), slice_max(ims, year), vjust=0, nudge_y=2) +
+  scale_x_continuous(
+    limits=c(0,50000),
+    labels=label_currency()
+  ) +
+  scale_color_continuous(limits=c(1900, 2025)) +
+  scale_size_continuous(
+    limits=c(0, 1e9),
+    breaks=c(1e6, 1e7, 1e8, 1e9),
+    labels=label_number(scale_cut=cut_short_scale())
+  )
+```
+
+## Logarithmic Axes
+
+```{r}
+#| layout-ncol: 2
+
+ims <- filter(gapminder, country %in% c("Indonesia", "Malaysia", "Singapore")) 
+
+ggplot(ims, aes(x=gdpPercap, y=lifeExp, group=country)) +
+  geom_point(aes(color=year, size=pop)) + 
+  geom_path(aes(color=year)) +
+  geom_text(aes(label=country), slice_max(ims, year), vjust=0, nudge_y=2) +
+  scale_x_continuous(
+    limits=c(0,50000),
+    labels=label_currency(scale_cut = cut_short_scale())
+  ) +
+  scale_color_continuous(limits=c(1900, 2025)) +
+  scale_size_continuous(
+    limits=c(0, 1e9),
+    breaks=c(1e6, 1e7, 1e8, 1e9),
+    labels=label_number(scale_cut=cut_short_scale())
+  )
+
+ims <- filter(gapminder, country %in% c("Indonesia", "Malaysia", "Singapore")) 
+
+ggplot(ims, aes(x=gdpPercap, y=lifeExp, group=country)) +
+  geom_point(aes(color=year, size=pop)) + 
+  geom_path(aes(color=year)) +
+  geom_text(aes(label=country), slice_max(ims, year), vjust=0, nudge_y=2) +
+  labs(x="GDP per capita (US$)") +
+  scale_x_log10(
+    #limits=c(100, 100000),
+    labels=label_number()
+  ) +
+  scale_color_continuous(limits=c(1900, 2025)) +
+  scale_size_continuous(
+    limits=c(0, 1e9),
+    breaks=c(1e6, 1e7, 1e8, 1e9),
+    labels=label_number(scale_cut=cut_short_scale())
+  )
+```
+
+wealth is always associated with logarithmic scales
+
+# Color Scales
+
+url: https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3
+
+```{r}
+#| layout-ncol: 2
+
+# distiller used for continuous color
+ggplot(tv, aes(x=tvhours, y=age, fill=pct)) +
+  geom_tile(color="gray20") +
+  scale_fill_distiller(palette="Blues", direction=1) +
+  theme_minimal()
+
+# fermenter used for binned color
+ggplot(tv, aes(x=tvhours, y=age, fill=pct)) +
+  geom_tile(color="gray20") +
+  scale_fill_fermenter(palette="Blues", direction=1, n.breaks=7) +
+  theme_minimal()
+```
+
+```{r}
+# brewer used for categorical color
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, color=Species, shape=Species)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r}
+
+```
